@@ -1,7 +1,7 @@
+"""Base Collection."""
+
 from flask_mongoengine import Document
 from flask_restful import abort
-
-from app.config import MongoConfig
 
 from mongoengine.errors import NotUniqueError
 from pymongo.errors import DuplicateKeyError

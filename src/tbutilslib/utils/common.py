@@ -1,64 +1,106 @@
-import json
+"""Common Utils."""
 import time
-from datetime import datetime, timedelta
-from enum import Enum
+from datetime import datetime, timedelta, date
+from typing import List, Dict, Any
 
-from bson import json_util
-from mongoengine import ValidationError
+from tbutilslib.config.constants import (TB_DATE_FORMAT,
+                                         START_TIME, END_TIME,
+                                         FULL_TS_FORMAT,
+                                         NSE_DATE_FORMAT,
+                                         TB_DT_MAPPING)
 
-from .constants import (DATE_FORMAT, CE, PE, START_TIME, END_TIME,
-                        FULL_TS_FORMAT, NSE_DATE_FORMAT, DATE_FORMAT_MAP)
-
-TODAY = datetime.today().strftime(DATE_FORMAT)
+TODAY = datetime.today().strftime(TB_DATE_FORMAT)
 
 
-def parse_timestamp(timestamp, format=FULL_TS_FORMAT):
+def parse_timestamp(timestamp: str, format: str = FULL_TS_FORMAT) -> datetime:
+    """Convert a string timestamp to datetime.
+
+    Args:
+        timestamp: str
+        format: str
+    Returns datetime
+    """
     return datetime.strptime(timestamp, format)
 
 
-def str_to_date(strDate, format=None):
+def str_to_date(strDate: str, format: str = None) -> date:
+    """Convert a date string to actual date.
+
+    Args:
+        strDate: str
+        format: str
+    Returns date
+    """
     format = format or NSE_DATE_FORMAT
     try:
         _date = datetime.strptime(strDate, format).date()
     except ValueError:
-        # print("Invalid Date format: %s" % str(exc))
-        _date = datetime.strptime(strDate, DATE_FORMAT).date()
+        _date = datetime.strptime(strDate, TB_DATE_FORMAT).date()
     return _date
 
 
-def parse_dates_to_str(data):
-    payload = []
-    if isinstance(data, dict):
-        payload = {
-            key: (val.strftime(DATE_FORMAT_MAP[key])
-                  if key in DATE_FORMAT_MAP else val)
-            for key, val in data.items()}
-    elif isinstance(data, list):
-        payload = [
-            {key: (val.strftime(DATE_FORMAT_MAP[key])
-                   if key in DATE_FORMAT_MAP else val)
-             for key, val in datum.items()} for datum in data]
+def date_to_str(val: date, format: str) -> str:
+    """Convert a date or datetime to a string.
+
+    Args:
+        val: date
+        format: str
+    Returns date
+    """
+    return val.strftime(format)
+
+
+def parse_dates_to_str(dates: List[Dict]) -> List[Dict]:
+    """Convert List of datetime values to string date values.
+
+    Args:
+        dates: List[Dict]
+    Returns: List[Dict]
+    """
+    data = dates if isinstance(dates, list) else [dates]
+    payload = [{key: (date_to_str(val, TB_DT_MAPPING[key])
+                      if key in TB_DT_MAPPING else val)
+                for key, val in datum.items()}
+               for datum in data]
+
     return payload
 
 
-def parse_dates_to_str_old(data, key, format=DATE_FORMAT):
-    if data and key in data[0].keys():
-        return [{**item, key: item.get(key).strftime(format)}
-                for item in data]
-    return data
+def parse_str_to_date(dateQuery: dict) -> dict:
+    """Convert a date string to actual date.
 
-
-def parse_str_to_date(query):
-    newQuery = query.copy()
-    for key, val in query.items():
-        newQuery[key] = (str_to_date(val, DATE_FORMAT_MAP[key])
-                         if key in DATE_FORMAT_MAP and isinstance(val, str)
+    Args:
+        dateQuery: dict
+    Returns date
+    """
+    newQuery = dateQuery.copy()
+    for key, val in dateQuery.items():
+        newQuery[key] = (str_to_date(val, TB_DT_MAPPING[key])
+                         if key in TB_DT_MAPPING and isinstance(val, str)
                          else val)
     return newQuery
 
 
-def parse_json(data):
-    return json.loads(json_util.dumps(data))
+def change_date_format(val: Any, reqFormat: str = TB_DATE_FORMAT):
+    """Expects a date-string or a date/datetime and converts it to new
+    dateformat.
+    """
+    _date = str_to_date(val) if isinstance(val, str) else val
+    return _date.strftime(reqFormat)
+
+
+def is_month_same(_date1: date, _date2: date) -> bool:
+    """Compare dates to check if the month is same."""
+    _date1 = str_to_date(_date1) if isinstance(_date1, str) else _date1
+    _date2 = str_to_date(_date2) if isinstance(_date2, str) else _date2
+    return _date1.month == _date2.month
+
+
+def parse_dates_to_str_old(data, key, format=TB_DATE_FORMAT):
+    if data and key in data[0].keys():
+        return [{**item, key: item.get(key).strftime(format)}
+                for item in data]
+    return data
 
 
 def get_next_thursday(dt):

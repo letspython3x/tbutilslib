@@ -1,13 +1,14 @@
+"""Derivatives Related Schema."""
 from marshmallow import Schema, fields, pre_load
-
-from app.utils.common import parse_timestamp
-from app.utils.constants import (DATE_FORMAT,
-                                 NSE_DATE_FORMAT,
-                                 FULL_TS_FORMAT,
-                                 FULL_TS_FORMAT_TZ)
+from tbutilslib.config.constants import (TB_DATE_FORMAT,
+                                         FULL_TS_FORMAT,
+                                         FULL_TS_FORMAT_TZ)
+from tbutilslib.utils.common import parse_timestamp
 
 
 class CumulativeDerivativesSchema(Schema):
+    """Cumulative Derivatives Schema."""
+
     security = fields.Str(required=True)
     spotPrice = fields.Float()
     futurePrice = fields.Float(default=0)
@@ -19,18 +20,25 @@ class CumulativeDerivativesSchema(Schema):
     pcrVol = fields.Float()
     totalOiFut = fields.Int()
     totalVolFut = fields.Int()
-    expiryDate = fields.Date(DATE_FORMAT)
-    onDate = fields.Date(DATE_FORMAT)
+    expiryDate = fields.Date(TB_DATE_FORMAT)
+    onDate = fields.Date(TB_DATE_FORMAT)
     timestamp = fields.DateTime(FULL_TS_FORMAT)
 
     @pre_load
-    def slugify_date(self, in_data, **kwargs):
+    def slugify_date(self, in_data: dict, **kwargs) -> dict:
+        """Set a new key onDate.
+
+        Args:
+            in_data: dict
+        """
         ts = parse_timestamp(in_data["timestamp"])
-        in_data["onDate"] = ts.date().strftime(DATE_FORMAT)
+        in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
         return in_data
 
 
 class CumulativeDerivativesResponseSchema(Schema):
+    """Cumulative Derivatives Response Schema."""
+
     cumulative = fields.Boolean(default=True)
     security = fields.Str()
     possibleKeys = fields.List(fields.Str())
@@ -39,10 +47,14 @@ class CumulativeDerivativesResponseSchema(Schema):
 
 
 class CumulativeRequestSchema(Schema):
+    """Cumulative Derivatives Request Schema."""
+
     security = fields.Str()
 
 
 class DerivativesSchemaCommonFields(Schema):
+    """Derivatives Common Fields."""
+
     security = fields.Str(required=True)
     identifier = fields.Str()
     optionType = fields.Str()
@@ -73,18 +85,25 @@ class DerivativesSchemaCommonFields(Schema):
     clientWisePositionLimits = fields.Int()
     marketWidePositionLimits = fields.Int()
     spotPrice = fields.Float()
-    expiryDate = fields.Date(DATE_FORMAT)
-    onDate = fields.Date(DATE_FORMAT)
+    expiryDate = fields.Date(TB_DATE_FORMAT)
+    onDate = fields.Date(TB_DATE_FORMAT)
     timestamp = fields.DateTime(FULL_TS_FORMAT)
 
     @pre_load
-    def slugify_date(self, in_data, **kwargs):
+    def slugify_date(self, in_data: dict, **kwargs) -> dict:
+        """Set a new key onDate.
+
+        Args:
+            in_data: dict
+        """
         ts = parse_timestamp(in_data["timestamp"])
-        in_data["onDate"] = ts.date().strftime(DATE_FORMAT)
+        in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
         return in_data
 
 
 class DerivativesSchemaResponseCommonFields(Schema):
+    """Derivatives Response Schema."""
+
     derivatives = fields.Boolean(default=True)
     security = fields.Str()
     possibleKeys = fields.List(fields.Str())
@@ -92,30 +111,44 @@ class DerivativesSchemaResponseCommonFields(Schema):
 
 
 class IndexDerivativesSchema(DerivativesSchemaCommonFields):
+    """Index Derivatives Schema."""
+
     pass
 
 
 class EquityDerivativesSchema(DerivativesSchemaCommonFields):
+    """Equity Derivatives Schema."""
+
     pass
 
 
 class IndexDerivativesResponseSchema(DerivativesSchemaResponseCommonFields):
+    """Index Derivatives Response Schema."""
+
     items = fields.List(fields.Nested(IndexDerivativesSchema))
 
 
 class EquityDerivativesResponseSchema(DerivativesSchemaResponseCommonFields):
+    """Equity Derivatives Response Schema."""
+
     items = fields.List(fields.Nested(EquityDerivativesSchema))
 
 
 class IndexRequestSchema(Schema):
+    """Index Derivatives Request Schema."""
+
     security = fields.Str(required=True)
 
 
 class EquityRequestSchema(Schema):
+    """Equity Derivatives Request Schema."""
+
     security = fields.Str(required=True)
 
 
 class HistoricalDerivativesSchema(Schema):
+    """Historical Derivatives Schema."""
+
     security = fields.Str(required=True)
     instrument = fields.Str()
     marketType = fields.Str()
@@ -134,14 +167,26 @@ class HistoricalDerivativesSchema(Schema):
     premiumValue = fields.Float()
     openInterest = fields.Int()
     changeInOI = fields.Int()
-    onDate = fields.Date(format=NSE_DATE_FORMAT)
-    expiryDate = fields.Date(format=NSE_DATE_FORMAT)
+    onDate = fields.Date(format=TB_DATE_FORMAT)
+    expiryDate = fields.Date(format=TB_DATE_FORMAT)
     timestamp = fields.DateTime(format=FULL_TS_FORMAT_TZ)
 
 
 class HistoricalDerivativesResponseSchema(Schema):
+    """Historical Derivatives Response Schema."""
+
     derivatives = fields.Boolean(default=True)
     security = fields.Str()
     possibleKeys = fields.List(fields.Str())
     totalItems = fields.Integer()
     items = fields.List(fields.Nested(HistoricalDerivativesSchema))
+
+
+class ExpiryDatesResponseSchema(Schema):
+    """Expiry Dates Schema."""
+
+    expiryDates = fields.Boolean(default=True)
+    security = fields.Str()
+    totalItems = fields.Integer()
+    possibleKeys = fields.List(fields.Str())
+    items = fields.List(fields.Date(format=TB_DATE_FORMAT))

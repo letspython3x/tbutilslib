@@ -1,12 +1,13 @@
-from app.models.nse import (AdvanceDeclineCollection,
-                            CumulativeDerivativesCollection,
-                            EventsCalendarCollection,
-                            EquityDerivatesCollection,
-                            FiiDiiCollection,
-                            HistoricalDerivatesCollection,
-                            IndexDerivativesCollection,
-                            NiftyEquityCollection,
-                            SecurityInFocusCollection)
+"""Ensure Indexes."""
+from tbutilslib.models import (AdvanceDeclineCollection,
+                               CumulativeDerivativesCollection,
+                               EventsCollection,
+                               EquityDerivatesCollection,
+                               FiiDiiCollection,
+                               HistoricalDerivatesCollection,
+                               IndexDerivativesCollection,
+                               NiftyEquityCollection,
+                               SecurityInFocusCollection)
 
 COLL_INDEXES = [
     {'collection': AdvanceDeclineCollection,
@@ -15,7 +16,7 @@ COLL_INDEXES = [
      'index': ['security', 'expiryDate', '+timestamp']},
     {'collection': EquityDerivatesCollection,
      'index': ['identifier', 'expiryDate', '+timestamp']},
-    {'collection': EventsCalendarCollection,
+    {'collection': EventsCollection,
      'index': ['security', 'purpose', '+eventDate']},
     {'collection': FiiDiiCollection,
      'index': ['category', '+onDate']},
@@ -31,6 +32,7 @@ COLL_INDEXES = [
 
 
 def ensure_index():
+    """Set indexes for collections."""
     for item in COLL_INDEXES:
         collection = item['collection']
         index = item['index']

@@ -1,16 +1,16 @@
-from app.utils.constants import FULL_TS_FORMAT, DATE_FORMAT
+"""Nifty Equity Collection."""
 from copy import deepcopy
 
 from mongoengine import fields as mongoFields
-
-from app.config import MongoConfig
-from app.models.base import BaseCollection, BASE_META
-from app.utils.common import not_empty
+from tbutilslib.config.constants import FULL_TS_FORMAT, TB_DATE_FORMAT
+from tbutilslib.config.database import MongoConfig
+from tbutilslib.models.base import BaseCollection, BASE_META
 
 
 class NiftyEquityCollection(BaseCollection):
     """NIFTY_EQUITY collection."""
-    security = mongoFields.StringField(validation=not_empty)
+
+    security = mongoFields.StringField(required=True)
     isFNOSec = mongoFields.BooleanField()
     lastPrice = mongoFields.FloatField()
     identifier = mongoFields.StringField()
@@ -29,12 +29,25 @@ class NiftyEquityCollection(BaseCollection):
     nearWKH = mongoFields.FloatField()
     nearWKL = mongoFields.FloatField()
     perChange365d = mongoFields.FloatField()
-    date30dAgo = mongoFields.DateField(format=DATE_FORMAT)
+    date30dAgo = mongoFields.DateField(format=TB_DATE_FORMAT)
     perChange30d = mongoFields.FloatField()
     chart30dPath = mongoFields.StringField()
     chartTodayPath = mongoFields.StringField()
-    onDate = mongoFields.DateField(format=DATE_FORMAT)
+    onDate = mongoFields.DateField(format=TB_DATE_FORMAT)
     timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT)
     meta = deepcopy(BASE_META)
     meta['ordering'] = ["-timestamp"]
     meta['collection'] = MongoConfig.NIFTY_EQUITY
+
+
+class AdvanceDeclineCollection(BaseCollection):
+    """ADVANCE_DECLINE collection."""
+
+    declines = mongoFields.IntField()
+    advances = mongoFields.IntField()
+    unchanged = mongoFields.IntField()
+    onDate = mongoFields.DateField(format=TB_DATE_FORMAT)
+    timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT)
+    meta = deepcopy(BASE_META)
+    meta['ordering'] = ["-timestamp"]
+    meta['collection'] = MongoConfig.ADVANCE_DECLINE
