@@ -27,7 +27,7 @@ COLL_INDEXES = [
     {'collection': NiftyEquityCollection,
      'index': ['identifier', '+lastUpdateTime']},
     {'collection': SecurityInFocusCollection,
-     'index': ['security', '+timestamp']},
+     'index': ['security', 'onDate']},
 ]
 
 
