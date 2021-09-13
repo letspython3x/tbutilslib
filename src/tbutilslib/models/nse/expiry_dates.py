@@ -10,7 +10,7 @@ from tbutilslib.models.base import BaseCollection, BASE_META
 class ExpiryDatesCollection(BaseCollection):
     """Expiry Dates Collection."""
 
-    index = mongoFields.BooleanField(default=False)
+    securityType = mongoFields.StringField(required=True)
     expiryDates = mongoFields.ListField(
         mongoFields.DateField(format=TB_DATE_FORMAT))
     timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT)

@@ -1,16 +1,15 @@
 """Expiry Dates Collection."""
 
 from marshmallow import Schema, fields
-from tbutilslib.config.constants import (TB_DATE_FORMAT,
-                                         FULL_TS_FORMAT)
+from tbutilslib.config.constants import TB_DATE_FORMAT, FULL_TS_FORMAT
 
 
 class ExpiryDatesSchema(Schema):
     """Expiry Dates Schema."""
 
-    index = fields.Bool(default=False)
+    securityType = fields.Str(required=True)
     expiryDates = fields.List(fields.Date(format=TB_DATE_FORMAT))
-    timestamp = fields.Date(format=FULL_TS_FORMAT)
+    timestamp = fields.DateTime(format=FULL_TS_FORMAT, )
 
 
 class ExpiryDatesResponseSchema(Schema):

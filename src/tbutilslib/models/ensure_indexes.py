@@ -18,7 +18,7 @@ COLL_INDEXES = [
     {'collection': EquityDerivatesCollection,
      'index': ['identifier', 'expiryDate', '-timestamp']},
     {'collection': ExpiryDatesCollection,
-     'index': ['-timestamp']},
+     'index': ['securityType', '-timestamp']},
     {'collection': EventsCollection,
      'index': ['security', 'purpose', '+eventDate']},
     {'collection': FiiDiiCollection,
