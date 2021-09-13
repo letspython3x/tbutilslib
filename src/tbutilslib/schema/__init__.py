@@ -21,3 +21,5 @@ from tbutilslib.schema.nse.security_in_focus import (
     SecurityInFocusResponseSchema,
     SecurityInFocusSchema)
 from tbutilslib.schema.nse.fiidii import FiiDiiSchema, FiiDiiResponseSchema
+from tbutilslib.schema.nse.expiry_dates import (ExpiryDatesSchema,
+                                                ExpiryDatesResponseSchema)

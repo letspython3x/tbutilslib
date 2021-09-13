@@ -9,3 +9,4 @@ from tbutilslib.models.nse.equities import (NiftyEquityCollection,
 from tbutilslib.models.nse.events import EventsCollection
 from tbutilslib.models.nse.security_in_focus import SecurityInFocusCollection
 from tbutilslib.models.nse.fiidii import FiiDiiCollection
+from tbutilslib.models.nse.expiry_dates import ExpiryDatesCollection
