@@ -109,6 +109,7 @@ class HistoricalDerivatesCollection(BaseCollection):
     onDate = mongoFields.DateField(format=TB_DATE_FORMAT)
     expiryDate = mongoFields.DateField(format=TB_DATE_FORMAT)
     timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT_TZ)
+    positionType = mongoFields.StringField()
     meta = deepcopy(BASE_META)
     meta['ordering'] = ["-timestamp"]
     meta['collection'] = MongoConfig.HISTORICAL_DERIVATIVES

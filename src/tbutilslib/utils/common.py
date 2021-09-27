@@ -96,6 +96,46 @@ def is_month_same(_date1: date, _date2: date) -> bool:
     return _date1.month == _date2.month
 
 
+def indexed_data(index: str, data: List[Dict]) -> Dict:
+    return {index.format(**datum): datum for datum in data}
+
+
+def separate_by_index(index: str, cache: List[Dict], live: List[Dict]) -> tuple:
+    """Separate by index.
+
+    segregates the data for post and put to TbApi.
+    Args:
+        index: str
+        cache: List[dict]
+        live: List[dict]
+    :return tuple
+    """
+    cacheInd = indexed_data(index, cache)
+    liveInd = indexed_data(index, live)
+
+    liveKeys = set(liveInd.keys())
+    cacheKeys = set(cacheInd.keys())
+
+    postKeys = liveKeys.difference(cacheKeys)
+    putKeys = liveKeys.intersection(cacheKeys)
+
+    postData = [liveInd[key] for key in postKeys]
+    putData = [liveInd[key] for key in putKeys]
+    return postData, putData
+
+
+def filter_fno_securities(data: list = None) -> tuple:
+    """
+    Filter the securities depending on if the security is future & options
+    enabled.
+    """
+    print("Separate securities if FnO enabled...")
+    fno = {item['security'] for item in data if item['fno']}
+    nonFno = {item['security'] for item in data if not item['fno']}
+    print(f"FNO: {len(fno)} : NON-FNO: {len(nonFno)}")
+    return fno, nonFno
+
+
 def parse_dates_to_str_old(data, key, format=TB_DATE_FORMAT):
     if data and key in data[0].keys():
         return [{**item, key: item.get(key).strftime(format)}

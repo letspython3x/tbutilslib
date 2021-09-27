@@ -72,10 +72,10 @@ class TbApiPathConfig:
     EXPIRY_DATES = "expiryDates"
     FII_DII = "fiidii"
     ADV_DECLINE = "advanceDecline"
-    INDEX_DERIVATIVES = "index/derivatives/{}"
-    EQUITY_DERIVATIVES = "equity/derivatives/{}"
-    CUMULATIVE_DERIVATIVES = "cumulative/{}"
-    HISTORICAL_DERIVATIVES = "historical/derivatives/{}"
+    INDEX_DERIVATIVES = "index/derivatives"
+    EQUITY_DERIVATIVES = "equity/derivatives"
+    CUMULATIVE_DERIVATIVES = "cumulative"
+    HISTORICAL_DERIVATIVES = "historical/derivatives"
     EQUITY = "equity"
 
 

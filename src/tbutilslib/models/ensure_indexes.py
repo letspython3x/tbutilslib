@@ -20,7 +20,7 @@ COLL_INDEXES = [
     {'collection': ExpiryDatesCollection,
      'index': ['securityType', '-timestamp']},
     {'collection': EventsCollection,
-     'index': ['security', 'purpose', '+eventDate']},
+     'index': ['security', 'purpose', '-eventDate']},
     {'collection': FiiDiiCollection,
      'index': ['category', '-onDate']},
     {'collection': HistoricalDerivatesCollection,
@@ -30,7 +30,7 @@ COLL_INDEXES = [
     {'collection': NiftyEquityCollection,
      'index': ['identifier', '-lastUpdateTime']},
     {'collection': SecurityInFocusCollection,
-     'index': ['security', '-onDate']},
+     'index': ['+security', '-onDate']},
 ]
 
 

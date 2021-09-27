@@ -48,21 +48,6 @@ class TbApi:
         headers = headers or {}
         headers = {**headers, **TbApiPathConfig.headers}
         return self.session.get(url, headers=headers, params=params)
-        # try:
-        #     resp = self.session.get(url, headers=headers, params=params)
-        #     resp.raise_for_status()
-        # except HTTPError as ex:
-        #     print(f'HTTP error occurred: {ex}')
-        # except (ReadTimeout, ReadTimeoutError) as ex:
-        #     print(f'Timeout Error Occured: {ex}')
-        # except ConnectionError as ex:
-        #     print(f'Connection Error Occured: {ex}')
-        # except RequestException as ex:
-        #     raise SystemExit(ex)
-        # except Exception as ex:
-        #     print(f">>> TBAPI POST REQUEST FAILURE: {ex}")
-        #     raise
-        # return resp.json() if resp else {}
 
     @request_decorator
     def post(self, url, data, headers=None):
@@ -72,22 +57,6 @@ class TbApi:
         headers = headers or {}
         headers = {**headers, **TbApiPathConfig.headers}
         return self.session.post(url, json=data, headers=headers)
-        # resp = None
-        # try:
-        #     resp = self.session.post(url, json=data, headers=headers)
-        #     resp.raise_for_status()
-        # except HTTPError as ex:
-        #     print(f'HTTP error occurred: {ex}')
-        # except (ReadTimeout, ReadTimeoutError) as ex:
-        #     print(f'Timeout Error Occured: {ex}')
-        # except ConnectionError as ex:
-        #     print(f'Connection Error Occured: {ex}')
-        # except RequestException as ex:
-        #     raise SystemExit(ex)
-        # except Exception as ex:
-        #     print(f">>> TBAPI POST REQUEST FAILURE: {ex}")
-        #     raise
-        # return resp
 
     @request_decorator
     def put(self, url, data, headers=None):
@@ -99,21 +68,7 @@ class TbApi:
     @request_decorator
     def delete(self, url, headers=None):
         headers = headers or {}
-        headers = {**headers, **TbApiPathConfig.headers, 'X-Force-Delete': True}
+        headers = {**headers,
+                   **TbApiPathConfig.headers,
+                   'X-Force-Delete': 'true'}
         return self.session.delete(url, headers=headers)
-        # resp = None
-        # try:
-        #     resp = self.session.delete(url, headers=headers)
-        #     resp.raise_for_status()
-        # except HTTPError as ex:
-        #     print(f'HTTP error occurred: {ex}')
-        # except (ReadTimeout, ReadTimeoutError) as ex:
-        #     print(f'Timeout Error Occured: {ex}')
-        # except ConnectionError as ex:
-        #     print(f'Connection Error Occured: {ex}')
-        # except RequestException as ex:
-        #     raise SystemExit(ex)
-        # except Exception as ex:
-        #     print(f">>> TBAPI POST REQUEST FAILURE: {ex}")
-        #     raise
-        # return resp

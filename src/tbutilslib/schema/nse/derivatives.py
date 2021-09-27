@@ -170,6 +170,7 @@ class HistoricalDerivativesSchema(Schema):
     onDate = fields.Date(format=TB_DATE_FORMAT)
     expiryDate = fields.Date(format=TB_DATE_FORMAT)
     timestamp = fields.DateTime(format=FULL_TS_FORMAT_TZ)
+    positionType = fields.Str()
 
 
 class HistoricalDerivativesResponseSchema(Schema):

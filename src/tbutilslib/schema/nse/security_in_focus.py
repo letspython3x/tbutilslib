@@ -1,4 +1,6 @@
 """Security in Focus Schema."""
+from datetime import date, datetime
+
 from marshmallow import Schema, fields, pre_load
 from tbutilslib.config.constants import TB_DATE_FORMAT, FULL_TS_FORMAT
 from tbutilslib.utils.common import parse_timestamp
@@ -7,11 +9,11 @@ from tbutilslib.utils.common import parse_timestamp
 class SecurityInFocusSchema(Schema):
     """Security in Focus Schema."""
 
-    security = fields.Str()
-    expiryDates = fields.List(fields.Date(TB_DATE_FORMAT), many=True)
+    security = fields.Str(required=True)
     strikePrices = fields.List(fields.Int)
-    onDate = fields.Date(TB_DATE_FORMAT)
-    timestamp = fields.DateTime(FULL_TS_FORMAT)
+    fno = fields.Bool(default=False)
+    onDate = fields.Date(TB_DATE_FORMAT, default=date.today())
+    timestamp = fields.DateTime(FULL_TS_FORMAT, default=datetime.now)
 
     @pre_load
     def slugify_date(self, in_data: dict, **kwargs) -> dict:
@@ -20,8 +22,9 @@ class SecurityInFocusSchema(Schema):
         Args:
             in_data: dict
         """
-        ts = parse_timestamp(in_data["timestamp"])
-        in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
+        if "timestamp" in in_data:
+            ts = parse_timestamp(in_data["timestamp"])
+            in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
         return in_data
 
 

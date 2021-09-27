@@ -10,12 +10,12 @@ from tbutilslib.models.base import BaseCollection, BASE_META
 class EventsCollection(BaseCollection):
     """EVENTS collection."""
 
-    index = mongoFields.StringField()
+    index = mongoFields.StringField(default="equities")
     security = mongoFields.StringField(required=True)
     company = mongoFields.StringField()
     purpose = mongoFields.StringField()
     description = mongoFields.StringField()
-    eventDate = mongoFields.DateField(format=TB_DATE_FORMAT)
+    eventDate = mongoFields.DateField(required=True, format=TB_DATE_FORMAT)
     fno = mongoFields.BooleanField()
     meta = deepcopy(BASE_META)
     meta['ordering'] = ["-eventDate"]
