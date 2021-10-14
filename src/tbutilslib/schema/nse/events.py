@@ -7,6 +7,7 @@ from tbutilslib.utils.common import str_to_date
 class EventsSchema(Schema):
     """Events Schema."""
 
+    id = fields.Str(required=False)
     security = fields.Str(required=True)
     eventDate = fields.Date(required=True, format=TB_DATE_FORMAT)
     index = fields.Str(required=False, default="equities")

@@ -9,6 +9,7 @@ from tbutilslib.utils.common import parse_timestamp, str_to_date
 class EquitySchema(Schema):
     """Equity Schema."""
 
+    id = fields.Str(required=False)
     security = fields.Str()
     isFNOSec = fields.Bool()
     lastPrice = fields.Float()
@@ -67,6 +68,7 @@ class EquityRequestSchema(Schema):
 class AdvanceDeclineSchema(Schema):
     """Advance Decline Schema."""
 
+    id = fields.Str(required=False)
     advances = fields.Int()
     declines = fields.Int()
     unchanged = fields.Int()

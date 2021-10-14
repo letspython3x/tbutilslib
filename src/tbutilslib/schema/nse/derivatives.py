@@ -9,6 +9,7 @@ from tbutilslib.utils.common import parse_timestamp
 class CumulativeDerivativesSchema(Schema):
     """Cumulative Derivatives Schema."""
 
+    id = fields.Str(required=False)
     security = fields.Str(required=True)
     spotPrice = fields.Float()
     futurePrice = fields.Float(default=0)
@@ -55,6 +56,7 @@ class CumulativeRequestSchema(Schema):
 class DerivativesSchemaCommonFields(Schema):
     """Derivatives Common Fields."""
 
+    id = fields.Str(required=False)
     security = fields.Str(required=True)
     identifier = fields.Str()
     optionType = fields.Str()
@@ -149,6 +151,7 @@ class EquityRequestSchema(Schema):
 class HistoricalDerivativesSchema(Schema):
     """Historical Derivatives Schema."""
 
+    id = fields.Str(required=False)
     security = fields.Str(required=True)
     instrument = fields.Str()
     marketType = fields.Str()
