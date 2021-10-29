@@ -130,9 +130,9 @@ def filter_fno_securities(data: list = None) -> tuple:
     enabled.
     """
     print("Separate securities if FnO enabled...")
-    fno = {item['security'] for item in data if item['fno']}
-    nonFno = {item['security'] for item in data if not item['fno']}
-    print(f"FNO: {len(fno)} : NON-FNO: {len(nonFno)}")
+    fno = list({item['security'] for item in data if item['fno']})
+    nonFno = list({item['security'] for item in data if not item['fno']})
+    print(f"Securities Separated-> FNO: {len(fno)} : NON-FNO: {len(nonFno)}")
     return fno, nonFno
 
 
