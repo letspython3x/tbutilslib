@@ -65,7 +65,7 @@ class TbApiPathConfig:
     """Trading Bot Api Path Config."""
 
     headers = {'Content-Type': 'application/json; charset=utf-8'}
-    BASE_URI = os.getenv('ENVIRONMENT', 'http://127.0.0.1:9000/api/v1/')
+    BASE_URI = os.getenv('ENVIRONMENT', 'http://0.0.0.0/api/v1/')
     EVENTS_PATH = "events"
     SECURITY_IN_FOCUS = "securityInFocus"
     MAX_OI = "maxOpenInterest"
