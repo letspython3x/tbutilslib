@@ -100,6 +100,9 @@ class DerivativesSchemaCommonFields(Schema):
         """
         ts = parse_timestamp(in_data["timestamp"])
         in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
+        marketLot = in_data["marketLot"]
+        in_data["changeinOpenInterest"] = int(in_data["changeinOpenInterest"]/marketLot)
+        in_data["openInterest"] = int(in_data["openInterest"]/marketLot)
         return in_data
 
 
@@ -174,6 +177,18 @@ class HistoricalDerivativesSchema(Schema):
     expiryDate = fields.Date(format=TB_DATE_FORMAT)
     timestamp = fields.DateTime(format=FULL_TS_FORMAT_TZ)
     positionType = fields.Str()
+
+    @pre_load
+    def slugify_data(self, in_data: dict, **kwargs) -> dict:
+        """Set a new key onDate.
+
+        Args:
+            in_data: dict
+        """
+        marketLot = in_data["marketLot"]
+        in_data["changeInOI"] = int(in_data["changeInOI"]/marketLot)
+        in_data["openInterest"] = int(in_data["openInterest"]/marketLot)
+        return in_data
 
 
 class HistoricalDerivativesResponseSchema(Schema):
