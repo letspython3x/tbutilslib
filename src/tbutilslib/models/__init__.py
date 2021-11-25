@@ -10,3 +10,4 @@ from tbutilslib.models.nse.events import EventsCollection
 from tbutilslib.models.nse.security_in_focus import SecurityInFocusCollection
 from tbutilslib.models.nse.fiidii import FiiDiiCollection
 from tbutilslib.models.nse.expiry_dates import ExpiryDatesCollection
+from tbutilslib.models.nse.trading_dates import TradingDatesCollection
