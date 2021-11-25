@@ -77,6 +77,7 @@ class TbApiPathConfig:
     CUMULATIVE_DERIVATIVES = "cumulative"
     HISTORICAL_DERIVATIVES = "historical/derivatives"
     EQUITY = "equity"
+    TRADING_DATES = "tradingDates"
 
 
 class Config:
