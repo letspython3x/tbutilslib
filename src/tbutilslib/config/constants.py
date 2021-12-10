@@ -20,9 +20,9 @@ TB_DT_MAPPING = {'expiryDate': TB_DATE_FORMAT,
                  'timestamp': FULL_TS_FORMAT,
                  'lastUpdateTime': FULL_TS_FORMAT, }
 
-PERCENT_INDEX = 4
-PERCENT_EQUITY = 10
-RETRY_SEC = 100
+PERCENT_INDEX = 3
+PERCENT_EQUITY = 5
+RETRY_SEC = 150
 
 START_TIME = "09:00:00"
 END_TIME = "15:33:10"

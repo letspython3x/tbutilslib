@@ -3,25 +3,27 @@ from marshmallow import Schema, fields, pre_load
 from tbutilslib.config.constants import (FULL_TS_FORMAT,
                                          NSE_DATE_FORMAT,
                                          TB_DATE_FORMAT)
-from tbutilslib.utils.common import parse_timestamp, str_to_date
+from tbutilslib.utils.common import (parse_timestamp,
+                                     str_to_date,
+                                     validate_quantity)
 
 
 class EquitySchema(Schema):
     """Equity Schema."""
 
-    id = fields.Str(required=False)
-    security = fields.Str()
+    id = fields.String(required=False)
+    security = fields.String()
     isFNOSec = fields.Bool()
     lastPrice = fields.Float()
-    identifier = fields.Str()
-    series = fields.Str()
+    identifier = fields.String()
+    series = fields.String()
     open = fields.Float()
     dayHigh = fields.Float()
     dayLow = fields.Float()
     previousClose = fields.Float()
     change = fields.Float()
     pChange = fields.Float()
-    totalTradedVolume = fields.Int()
+    totalTradedVolume = fields.Integer(validate=validate_quantity)
     totalTradedValue = fields.Float()
     yearHigh = fields.Float()
     yearLow = fields.Float()
@@ -30,8 +32,8 @@ class EquitySchema(Schema):
     perChange365d = fields.Float()
     date30dAgo = fields.Date(format=TB_DATE_FORMAT)
     perChange30d = fields.Float()
-    chart30dPath = fields.Str()
-    chartTodayPath = fields.Str()
+    chart30dPath = fields.String()
+    chartTodayPath = fields.String()
     timestamp = fields.DateTime(FULL_TS_FORMAT)
     onDate = fields.Date(format=TB_DATE_FORMAT)
     lastUpdateTime = fields.DateTime(FULL_TS_FORMAT)
@@ -54,7 +56,7 @@ class EquityResponseSchema(Schema):
     """Equity Response Schema."""
 
     equity = fields.Boolean(default=True)
-    possibleKeys = fields.List(fields.Str())
+    possibleKeys = fields.List(fields.String())
     totalItems = fields.Integer()
     items = fields.List(fields.Nested(EquitySchema))
 
@@ -62,16 +64,16 @@ class EquityResponseSchema(Schema):
 class EquityRequestSchema(Schema):
     """Equity Request Schema."""
 
-    security = fields.Str()
+    security = fields.String()
 
 
 class AdvanceDeclineSchema(Schema):
     """Advance Decline Schema."""
 
-    id = fields.Str(required=False)
-    advances = fields.Int()
-    declines = fields.Int()
-    unchanged = fields.Int()
+    id = fields.String(required=False)
+    advances = fields.Integer(validate=validate_quantity)
+    declines = fields.Integer(validate=validate_quantity)
+    unchanged = fields.Integer(validate=validate_quantity)
     timestamp = fields.DateTime(FULL_TS_FORMAT)
     onDate = fields.Date(TB_DATE_FORMAT)
 

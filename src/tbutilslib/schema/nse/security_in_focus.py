@@ -9,8 +9,8 @@ from tbutilslib.utils.common import parse_timestamp
 class SecurityInFocusSchema(Schema):
     """Security in Focus Schema."""
 
-    id = fields.Str(required=False)
-    security = fields.Str(required=True)
+    id = fields.String(required=False)
+    security = fields.String(required=True)
     strikePrices = fields.List(fields.Int)
     fno = fields.Bool(default=False)
     onDate = fields.Date(TB_DATE_FORMAT, default=date.today())
@@ -34,5 +34,5 @@ class SecurityInFocusResponseSchema(Schema):
 
     securityInFocus = fields.Boolean(default=True)
     totalItems = fields.Integer()
-    securities = fields.List(fields.Str)
+    securities = fields.List(fields.String)
     items = fields.List(fields.Nested(SecurityInFocusSchema))

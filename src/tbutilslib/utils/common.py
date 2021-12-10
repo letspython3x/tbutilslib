@@ -3,6 +3,7 @@ import time
 from datetime import datetime, timedelta, date
 from typing import List, Dict, Any
 
+from marshmallow import ValidationError
 from tbutilslib.config.constants import (TB_DATE_FORMAT,
                                          START_TIME, END_TIME,
                                          FULL_TS_FORMAT,
@@ -47,7 +48,7 @@ def date_to_str(val: date, format: str) -> str:
         format: str
     Returns date
     """
-    return val.strftime(format)
+    return val.strftime(format) if isinstance(val, date) else val
 
 
 def parse_dates_to_str(dates: List[Dict]) -> List[Dict]:
@@ -62,8 +63,7 @@ def parse_dates_to_str(dates: List[Dict]) -> List[Dict]:
                       if key in TB_DT_MAPPING else val)
                 for key, val in datum.items()}
                for datum in data]
-
-    return payload
+    return payload if isinstance(dates, list) else payload[0]
 
 
 def parse_str_to_date(dateQuery: dict) -> dict:
@@ -178,3 +178,17 @@ def is_trading_hours_open() -> bool:
         print(f"{STARS} Day is Over {STARS}")
         flag = False
     return flag
+
+
+def validate_quantity(n, validValue=0):
+    if n <= validValue:
+        raise ValidationError(f"Value must be greater than {validValue}.")
+
+
+def is_valid_schema(schema, data):
+    try:
+        data = parse_dates_to_str(data)
+        schema().load(data, many=isinstance(data, list))
+        return True
+    except ValidationError as err:
+        print(f"Validation Error: {err.messages}")

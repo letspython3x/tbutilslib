@@ -7,7 +7,7 @@ from tbutilslib.utils.common import TODAY
 
 FORMATTER = logging.Formatter(
     "%(asctime)s — %(name)s — %(levelname)s — %(message)s")
-LOG_FILE = f"TradingBot{TODAY}.log"
+LOG_FILE = f"TradingBot_{TODAY}.log"
 
 
 def get_console_handler():
@@ -26,7 +26,9 @@ def get_file_handler(log_file=None):
 def get_logger(logger_name, log_file=None):
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(get_console_handler())
-    logger.addHandler(get_file_handler(log_file))
+    if log_file:
+        logger.addHandler(get_file_handler(log_file))
+    else:
+        logger.addHandler(get_console_handler())
     logger.propagate = False
     return logger

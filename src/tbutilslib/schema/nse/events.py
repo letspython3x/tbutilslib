@@ -7,13 +7,13 @@ from tbutilslib.utils.common import str_to_date
 class EventsSchema(Schema):
     """Events Schema."""
 
-    id = fields.Str(required=False)
-    security = fields.Str(required=True)
+    id = fields.String(required=False)
+    security = fields.String(required=True)
     eventDate = fields.Date(required=True, format=TB_DATE_FORMAT)
-    index = fields.Str(required=False, default="equities")
-    company = fields.Str()
-    purpose = fields.Str()
-    description = fields.Str()
+    index = fields.String(required=False, default="equities")
+    company = fields.String()
+    purpose = fields.String()
+    description = fields.String()
     fno = fields.Bool(default=False)
 
     @pre_load
@@ -32,7 +32,7 @@ class EventsResponseSchema(Schema):
     """Events Response Schema."""
 
     events = fields.Boolean(default=True)
-    possibleKeys = fields.List(fields.Str())
+    possibleKeys = fields.List(fields.String())
     totalItems = fields.Int()
     items = fields.List(fields.Nested(EventsSchema))
 
@@ -40,4 +40,4 @@ class EventsResponseSchema(Schema):
 class EventsRequestSchema(Schema):
     """Events Request Schema."""
 
-    security = fields.Str()
+    security = fields.String()
