@@ -182,7 +182,7 @@ def is_trading_hours_open() -> bool:
 
 def validate_quantity(n, validValue=0):
     if n <= validValue:
-        raise ValidationError(f"Value must be greater than {validValue}.")
+        raise ValidationError(f"Value: {n} must be greater than {validValue}.")
 
 
 def is_valid_schema(schema, data):

@@ -71,9 +71,9 @@ class AdvanceDeclineSchema(Schema):
     """Advance Decline Schema."""
 
     id = fields.String(required=False)
-    advances = fields.Integer(validate=validate_quantity)
-    declines = fields.Integer(validate=validate_quantity)
-    unchanged = fields.Integer(validate=validate_quantity)
+    advances = fields.Integer()
+    declines = fields.Integer()
+    unchanged = fields.Integer()
     timestamp = fields.DateTime(FULL_TS_FORMAT)
     onDate = fields.Date(TB_DATE_FORMAT)
 
