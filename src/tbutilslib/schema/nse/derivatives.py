@@ -100,11 +100,6 @@ class DerivativesSchemaCommonFields(Schema):
         """
         ts = parse_timestamp(in_data["timestamp"])
         in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
-        marketLot = in_data["marketLot"]
-        if marketLot and marketLot != 0:
-            in_data["changeinOpenInterest"] = int(
-                in_data["changeinOpenInterest"] / marketLot)
-            in_data["openInterest"] = int(in_data["openInterest"] / marketLot)
         return in_data
 
 
