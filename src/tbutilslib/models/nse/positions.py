@@ -7,20 +7,18 @@ from tbutilslib.config.database import MongoConfig
 from tbutilslib.models.base import BaseCollection, BASE_META
 
 
-class OrdersCollection(BaseCollection):
-    """ORDERS collection."""
+class PositionsCollection(BaseCollection):
+    """POSITIONS collection."""
 
-    orderId = mongoFields.IntField(required=True)
+    account = mongoFields.IntField(required=True)
     security = mongoFields.StringField(required=True)
-    status = mongoFields.StringField()
-    action = mongoFields.StringField()
-    limitPrice = mongoFields.FloatField()
-    auxPrice = mongoFields.FloatField()
-    totalQuantity = mongoFields.FloatField()
-    filled = mongoFields.FloatField()
-    remaining = mongoFields.FloatField()
+    secType = mongoFields.StringField()
+    currency = mongoFields.StringField()
+    position = mongoFields.FloatField()
+    avgCost = mongoFields.FloatField()
+    onDate = mongoFields.DateField(format=TB_DATE_FORMAT)
     timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT,
                                           default=datetime.now)
     meta = deepcopy(BASE_META)
     meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.ORDERS
+    meta['collection'] = MongoConfig.POSITIONS

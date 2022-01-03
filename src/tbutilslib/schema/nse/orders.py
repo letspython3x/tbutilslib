@@ -1,6 +1,6 @@
-from marshmallow import Schema, fields, pre_load
-from tbutilslib.config.constants import TB_DATE_FORMAT, FULL_TS_FORMAT
-from tbutilslib.utils.common import parse_timestamp, validate_quantity
+from marshmallow import Schema, fields
+from tbutilslib.config.constants import FULL_TS_FORMAT
+from tbutilslib.utils.common import validate_quantity
 
 
 class OrdersSchema(Schema):
@@ -15,19 +15,7 @@ class OrdersSchema(Schema):
     totalQuantity = fields.Float(validate=validate_quantity)
     filled = fields.Float()
     remaining = fields.Float()
-    onDate = fields.Date(TB_DATE_FORMAT)
     timestamp = fields.DateTime(FULL_TS_FORMAT)
-
-    @pre_load
-    def slugify_date(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key onDate.
-
-        Args:
-            in_data: dict
-        """
-        ts = parse_timestamp(in_data["timestamp"])
-        in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
-        return in_data
 
 
 class OrdersResponseSchema(Schema):

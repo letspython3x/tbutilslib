@@ -25,3 +25,5 @@ from ..schema.nse.expiry_dates import (ExpiryDatesSchema,
 from ..schema.nse.trading_dates import (TradingDatesSchema,
                                         TradingDatesResponseSchema)
 from ..schema.nse.orders import OrdersSchema, OrdersResponseSchema
+from ..schema.nse.positions import PositionsSchema, PositionsResponseSchema
+

@@ -79,6 +79,7 @@ class TbApiPathConfig:
     EQUITY = "equity"
     TRADING_DATES = "tradingDates"
     ORDERS = "orders"
+    POSITIONS = "positions"
 
 
 class Config:

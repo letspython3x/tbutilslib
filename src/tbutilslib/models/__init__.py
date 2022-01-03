@@ -12,3 +12,4 @@ from ..models.nse.fiidii import FiiDiiCollection
 from ..models.nse.expiry_dates import ExpiryDatesCollection
 from ..models.nse.trading_dates import TradingDatesCollection
 from ..models.nse.orders import OrdersCollection
+from ..models.nse.positions import PositionsCollection
