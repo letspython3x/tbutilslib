@@ -8,7 +8,8 @@ from tbutilslib.models import (AdvanceDeclineCollection,
                                HistoricalDerivatesCollection,
                                IndexDerivativesCollection,
                                NiftyEquityCollection,
-                               SecurityInFocusCollection)
+                               SecurityInFocusCollection,
+                               OrdersCollection)
 
 COLL_INDEXES = [
     {'collection': AdvanceDeclineCollection,
@@ -31,6 +32,8 @@ COLL_INDEXES = [
      'index': ['identifier', '-lastUpdateTime']},
     {'collection': SecurityInFocusCollection,
      'index': ['+security', '-onDate']},
+    {'collection': OrdersCollection,
+     'index': ['+orderId', '-onDate']},
 ]
 
 

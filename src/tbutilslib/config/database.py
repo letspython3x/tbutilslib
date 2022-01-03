@@ -6,8 +6,8 @@ class MongoConfig:
     """Configuration for Mongo."""
 
     MONGODB_DB = os.getenv("MONGODB_DB", "StockMarket")
-    HOST = "127.0.0.1"
-    PORT = 27017
+    HOST = os.getenv("MONGODB_HOST", "127.0.0.1")
+    PORT = os.getenv("MONGODB_PORT", 27017)
     MONGODB_URI = os.getenv("MONGODB_URI",
                             "mongodb://127.0.0.1:27017/StockMarket")
     ADVANCE_DECLINE = "ADVANCE_DECLINE"
@@ -21,3 +21,4 @@ class MongoConfig:
     NIFTY_EQUITY = "NIFTY_EQUITY"
     SECURITY_IN_FOCUS = "SECURITY_IN_FOCUS"
     TRADING_DATES = "TRADING_DATES"
+    ORDERS = "ORDERS"

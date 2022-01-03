@@ -42,8 +42,8 @@ class CumulativeDerivativesResponseSchema(Schema):
 
     cumulative = fields.Boolean(default=True)
     security = fields.String()
-    possibleKeys = fields.List(fields.String())
     totalItems = fields.Integer()
+    possibleKeys = fields.List(fields.String())
     items = fields.List(fields.Nested(CumulativeDerivativesSchema))
 
 
@@ -108,8 +108,8 @@ class DerivativesSchemaResponseCommonFields(Schema):
 
     derivatives = fields.Boolean(default=True)
     security = fields.String()
-    possibleKeys = fields.List(fields.String())
     totalItems = fields.Integer()
+    possibleKeys = fields.List(fields.String())
 
 
 class IndexDerivativesSchema(DerivativesSchemaCommonFields):
@@ -194,13 +194,13 @@ class HistoricalDerivativesResponseSchema(Schema):
 
     derivatives = fields.Boolean(default=True)
     security = fields.String()
-    possibleKeys = fields.List(fields.String())
     totalItems = fields.Integer()
+    possibleKeys = fields.List(fields.String())
     items = fields.List(fields.Nested(HistoricalDerivativesSchema))
 
 
 class ExpiryDatesResponseSchema(Schema):
-    """Expiry Dates Schema."""
+    """Expiry Dates Response Schema."""
 
     expiryDates = fields.Boolean(default=True)
     security = fields.String()
