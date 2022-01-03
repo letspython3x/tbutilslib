@@ -23,6 +23,17 @@ def parse_timestamp(timestamp: str, format: str = FULL_TS_FORMAT) -> datetime:
     """
     return datetime.strptime(timestamp, format)
 
+def parse_timestamp_to_str(timestamp: datetime,
+                           format: str = FULL_TS_FORMAT) -> str:
+    """Convert a string timestamp to datetime.
+
+    Args:
+        timestamp: datetime
+        format: str
+    Returns datetime
+    """
+    return datetime.strftime(timestamp, format)
+
 
 def str_to_date(strDate: str, format: str = None) -> date:
     """Convert a date string to actual date.

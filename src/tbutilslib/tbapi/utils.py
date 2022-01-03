@@ -5,7 +5,9 @@ from urllib.parse import urljoin
 
 from tbutilslib.config.apiconfig import TbApiPathConfig
 from tbutilslib.tbapi.api import TbApi
-from tbutilslib.utils.common import TODAY, parse_timestamp
+from tbutilslib.utils.common import (TODAY,
+                                     parse_timestamp,
+                                     parse_timestamp_to_str)
 
 name = os.path.basename(__file__)
 
@@ -56,13 +58,16 @@ def get_cache_investment():
     return cache.get('items')[0] if cache else []
 
 
-def get_most_traded_securities_by_value(count=3):
+def get_most_traded_securities(key="totalTradedValue", count=3):
+    """Fetch most Traded securities"""
     api = TbApi()
     url = urljoin(TbApiPathConfig.BASE_URI, TbApiPathConfig.EQUITY)
     url = f"{url}/{TODAY}"
     cache = api.get(url)
-    items = cache.get('items')[0] if cache else []
+    items = cache.get('items') if cache else []
+    items = [item for item in items if item["security"] != "NIFTY"]
     latestTs = max([parse_timestamp(item["timestamp"]) for item in items])
+    latestTs = parse_timestamp_to_str(latestTs)
     latestTsPayload = [item for item in items if item["timestamp"] == latestTs]
-    latestTsPayload.sort(key=lambda x: x["totalTradedValue"])
+    latestTsPayload.sort(key=lambda x: x[key], reverse=True)
     return latestTsPayload[:count]
