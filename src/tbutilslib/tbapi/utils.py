@@ -71,3 +71,44 @@ def get_most_traded_securities(key="totalTradedValue", count=3):
     latestTsPayload = [item for item in items if item["timestamp"] == latestTs]
     latestTsPayload.sort(key=lambda x: x[key], reverse=True)
     return latestTsPayload[:count]
+
+
+def save_orders(orders):
+    api = TbApi()
+    url = urljoin(TbApiPathConfig.BASE_URI, TbApiPathConfig.ORDERS)
+    url = f"{url}/{TODAY}"
+    cache = api.get(url)
+    items = cache.get('items') if cache else []
+    cacheOrderIds = {od["orderId"] for od in items}
+    postOrderIds = set(orders.keys()).difference(cacheOrderIds)
+    putOrderIds = set(orders.keys()).intersection(cacheOrderIds)
+    postOrders = [{**val, "onDate": TODAY}
+                  for oid, val in orders.items()
+                  if oid in postOrderIds]
+    putOrders = [{**val, "onDate": TODAY}
+                 for oid, val in orders.items()
+                 if oid in putOrderIds]
+
+    api.post(postOrders)
+    api.post(putOrders)
+
+
+def save_positions(positions):
+    api = TbApi()
+    url = urljoin(TbApiPathConfig.BASE_URI, TbApiPathConfig.POSITIONS)
+    url = f"{url}/{TODAY}"
+    cache = api.get(url)
+    items = cache.get('items') if cache else []
+    cachePositions = {pos["security"] for pos in items}
+    postSecurities = set(positions.keys()).difference(cachePositions)
+    putSecurities = set(positions.keys()).intersection(cachePositions)
+
+    postPositions = [{**val, "onDate": TODAY}
+                     for pos, val in positions.items()
+                     if pos in postSecurities]
+    putPositions = [{**val, "onDate": TODAY}
+                    for pos, val in positions.items()
+                    if pos in putSecurities]
+
+    api.post(postPositions)
+    api.post(putPositions)
