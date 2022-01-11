@@ -6,7 +6,7 @@ from tbutilslib.utils.common import parse_timestamp, validate_quantity
 class PositionsSchema(Schema):
     """Positions Schema."""
 
-    account = fields.Integer(required=True)
+    account = fields.String(required=True)
     security = fields.String(required=True)
     secType = fields.String()
     currency = fields.String()

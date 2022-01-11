@@ -10,7 +10,7 @@ from tbutilslib.models.base import BaseCollection, BASE_META
 class PositionsCollection(BaseCollection):
     """POSITIONS collection."""
 
-    account = mongoFields.IntField(required=True)
+    account = mongoFields.StringField(required=True)
     security = mongoFields.StringField(required=True)
     secType = mongoFields.StringField()
     currency = mongoFields.StringField()

@@ -2,12 +2,14 @@ import json
 import os
 from typing import Dict, List
 from urllib.parse import urljoin
+from datetime import datetime
 
 from tbutilslib.config.apiconfig import TbApiPathConfig
 from tbutilslib.tbapi.api import TbApi
 from tbutilslib.utils.common import (TODAY,
                                      parse_timestamp,
                                      parse_timestamp_to_str)
+from tbutilslib.schema import OrdersSchema, PositionsSchema
 
 name = os.path.basename(__file__)
 
@@ -80,17 +82,24 @@ def save_orders(orders):
     cache = api.get(url)
     items = cache.get('items') if cache else []
     cacheOrderIds = {od["orderId"] for od in items}
-    postOrderIds = set(orders.keys()).difference(cacheOrderIds)
-    putOrderIds = set(orders.keys()).intersection(cacheOrderIds)
-    postOrders = [{**val, "onDate": TODAY}
-                  for oid, val in orders.items()
-                  if oid in postOrderIds]
-    putOrders = [{**val, "onDate": TODAY}
-                 for oid, val in orders.items()
-                 if oid in putOrderIds]
+    orderKeys = set(orders.keys())
+    postOrderIds = orderKeys.difference(cacheOrderIds)
+    # putOrderIds = ordersKeys.intersection(cacheOrderIds)
 
-    api.post(url, postOrders)
-    api.put(url, putOrders)
+    orders = [{**val,
+               "security": val["symbol"],
+               "limitPrice": val["lmtPrice"],
+               "onDate": datetime.today(),
+               "timestamp": datetime.now()}
+              for oid, val in orders.items()]
+    orders = OrdersSchema().dump(orders, many=True)
+    postOrders = [order for order in orders
+                  if order["orderId"] in postOrderIds]
+    # putOrders = [order for order in orders
+    #              if order["orderId"] in putOrderIds]
+    if postOrders:
+        api.post(url, postOrders)
+    # api.put(url, putOrders)
 
 
 def save_positions(positions):
@@ -100,15 +109,22 @@ def save_positions(positions):
     cache = api.get(url)
     items = cache.get('items') if cache else []
     cachePositions = {pos["security"] for pos in items}
-    postSecurities = set(positions.keys()).difference(cachePositions)
-    putSecurities = set(positions.keys()).intersection(cachePositions)
+    positionKeys = set(positions.keys())
+    postSecurities = positionKeys.difference(cachePositions)
+    # putSecurities = positionKeys.intersection(cachePositions)
 
-    postPositions = [{**val, "onDate": TODAY}
-                     for pos, val in positions.items()
-                     if pos in postSecurities]
-    putPositions = [{**val, "onDate": TODAY}
-                    for pos, val in positions.items()
-                    if pos in putSecurities]
+    positions = [{**val,
+                  "security": val["symbol"],
+                  "onDate": datetime.today(),
+                  "timestamp": datetime.now()}
+                 for val in positions.values()]
+    positions = PositionsSchema().dump(positions, many=True)
+    postPositions = [val for val in positions
+                     if val["security"] in postSecurities]
+    if postPositions:
+        api.post(url, postPositions)
+    # putPositions = [val for val in positions
+    #                 if val["security"] in putSecurities]
 
-    api.post(url, postPositions)
-    api.put(url, putPositions)
+
+    # api.put(url, putPositions)
