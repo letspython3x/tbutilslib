@@ -89,8 +89,8 @@ def save_orders(orders):
                  for oid, val in orders.items()
                  if oid in putOrderIds]
 
-    api.post(postOrders)
-    api.post(putOrders)
+    api.post(url, postOrders)
+    api.put(url, putOrders)
 
 
 def save_positions(positions):
@@ -110,5 +110,5 @@ def save_positions(positions):
                     for pos, val in positions.items()
                     if pos in putSecurities]
 
-    api.post(postPositions)
-    api.post(putPositions)
+    api.post(url, postPositions)
+    api.put(url, putPositions)
