@@ -7,6 +7,7 @@ from datetime import datetime
 class OrdersSchema(Schema):
     """Orders Schema."""
 
+    id = fields.String(required=False)
     orderId = fields.Integer(required=True)
     security = fields.String(required=True)
     secType = fields.String(required=True)
