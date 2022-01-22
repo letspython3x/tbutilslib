@@ -189,32 +189,32 @@ class TbApi:
         latestTsPayload.sort(key=lambda x: x[key], reverse=True)
         return latestTsPayload[:count]
 
-    def save_orders(self, orders):
+    def save_orders(self, orders: List[Dict]):
         """Save orders to TbApi."""
         endpoint = f"{TbApiPathConfig.ORDERS}/{TODAY}"
         cacheOrders = self.get_orders()
         cacheOrderIds = {od["orderId"] for od in cacheOrders}
-        postOrders = [{**val,
-                       "security": val["symbol"],
-                       "limitPrice": val["lmtPrice"],
+        postOrders = [{**order,
+                       "security": order["symbol"],
+                       "limitPrice": order["lmtPrice"],
                        "onDate": datetime.today(),
                        "timestamp": datetime.now()}
-                      for oid, val in orders.items()
-                      if oid not in cacheOrderIds]
+                      for order in orders
+                      if order["orderId"] not in cacheOrderIds]
         postOrders = OrdersSchema().dump(postOrders, many=True)
         self.post(endpoint, data=postOrders)
 
-    def save_positions(self, positions):
+    def save_positions(self, positions: List[Dict]):
         """Save positions to TbApi."""
         endpoint = f"{TbApiPathConfig.POSITIONS}/{TODAY}"
         cachePositions = self.get_positions()
         cacheSecurities = {pos["security"] for pos in cachePositions}
-        positions = [{**val,
-                      "security": val["symbol"],
+        positions = [{**position,
+                      "security": position["symbol"],
                       "onDate": datetime.today(),
                       "timestamp": datetime.now()}
-                     for val in positions.values()
-                     if val["symbol"] not in cacheSecurities]
+                     for position in positions
+                     if position["symbol"] not in cacheSecurities]
         postPositions = PositionsSchema().dump(positions, many=True)
         self.post(endpoint, data=postPositions)
 
