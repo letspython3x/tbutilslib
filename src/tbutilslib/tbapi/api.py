@@ -1,3 +1,4 @@
+# Below code is deprecated
 import functools
 
 import requests
@@ -35,6 +36,7 @@ class TbApi:
         self._cookies = None
         self.uri = TbApiPathConfig.BASE_URI
         self.url = url
+        raise Exception("Deprecated: Do not use this...")
 
     @property
     def session(self):
