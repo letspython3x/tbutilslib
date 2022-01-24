@@ -35,10 +35,10 @@ OPTIONS = "OPTIONS"
 VALID_CODES = [200, 201, 202]
 
 
-class EnumIndicator(Enum):
+class Position(Enum):
     """Enum for Indicator."""
 
-    LONG = "LONG"
-    SHORT = "SHORT"
+    LONG = "LONG POSITIONS"
+    SHORT = "SHORT POSITIONS"
     LONG_UNWINDING = "LONG UNWINDING"
-    SHORT_COVERING = "LONG COVERING"
+    SHORT_COVERING = "SHORT COVERING"

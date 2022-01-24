@@ -143,20 +143,24 @@ class TbApi:
         endpoint = f"{TbApiPathConfig.SECURITY_IN_FOCUS}/{onDate}"
         return self.get(endpoint)
 
-    def get_historical_derivatives(self, security: str):
+    def get_historical_derivatives(self,
+                                   security: str = None,
+                                   query: Dict = None):
         """Get Cache Historical Derivatives."""
-        endpoint = f"{TbApiPathConfig.HISTORICAL_DERIVATIVES}/{security}"
-        return self.get(endpoint)
+        endpoint = (f"{TbApiPathConfig.HISTORICAL_DERIVATIVES}/{security}" if
+                    security else TbApiPathConfig.HISTORICAL_DERIVATIVES)
+        return self.get(endpoint, query=query)
 
     def get_investment(self):
         """Fetch cache Fii-Dii Investment from TbApi."""
         endpoint = TbApiPathConfig.FII_DII
         return self.get(endpoint)
 
-    def get_trading_dates(self):
+    def get_trading_dates(self, count=5):
         """Fetch cache Trading Dates from TbApi."""
-        endpoint = TbApiPathConfig.TRADING_DATES
-        return self.get(endpoint)
+        fiiDii = self.get_investment()
+        dates = list({item["onDate"] for item in fiiDii})
+        return dates[:count]
 
     def get_orders(self, onDate=TODAY):
         """Fetch cache Orders from TbApi."""
@@ -166,6 +170,11 @@ class TbApi:
     def get_positions(self, onDate=TODAY):
         """Fetch cache Orders from TbApi."""
         endpoint = f"{TbApiPathConfig.POSITIONS}/{onDate}"
+        return self.get(endpoint)
+
+    def get_expiry_dates(self, securityType="equity"):
+        """Fetch cache Orders from TbApi."""
+        endpoint = f"{TbApiPathConfig.EXPIRY_DATES}/{securityType.lower()}"
         return self.get(endpoint)
 
     def get_events(self, query: Dict = None, securities: List = None):
