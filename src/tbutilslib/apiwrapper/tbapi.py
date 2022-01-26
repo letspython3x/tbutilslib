@@ -156,11 +156,16 @@ class TbApi:
         endpoint = TbApiPathConfig.FII_DII
         return self.get(endpoint)
 
-    def get_trading_dates(self, count=5):
-        """Fetch cache Trading Dates from TbApi."""
+    def get_past_trading_dates(self, count: int):
+        """Fetch past trading dates from TbApi."""
         fiiDii = self.get_investment()
         dates = list({item["onDate"] for item in fiiDii})
         return dates[:count]
+
+    def get_trading_dates(self):
+        """Fetch cache Trading Dates from TbApi."""
+        endpoint = TbApiPathConfig.TRADING_DATES
+        return self.get(endpoint)
 
     def get_orders(self, onDate=TODAY):
         """Fetch cache Orders from TbApi."""

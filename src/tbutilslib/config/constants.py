@@ -38,7 +38,7 @@ VALID_CODES = [200, 201, 202]
 class Position(Enum):
     """Enum for Indicator."""
 
-    LONG = "LONG POSITIONS"
-    SHORT = "SHORT POSITIONS"
-    LONG_UNWINDING = "LONG UNWINDING"
-    SHORT_COVERING = "SHORT COVERING"
+    LONG = "Long Positions"
+    SHORT = "Short Positions"
+    LONG_UNWINDING = "Long Unwinding"
+    SHORT_COVERING = "Short Covering"
