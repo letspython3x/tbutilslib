@@ -30,15 +30,15 @@ def request_decorator(func, *args, **kwargs):
             resp = func(*args, **kwargs)
             resp.raise_for_status()
         except HTTPError as ex:
-            print(f'HTTP error occurred: {ex}')
+            logger.exception(f'HTTP error occurred: {ex}')
         except (ReadTimeout, ReadTimeoutError) as ex:
-            print(f'Timeout error occurred: {ex}')
+            logger.exception(f'Timeout error occurred: {ex}')
         except ConnectionError as ex:
-            print(f'Connection error occurred: {ex}')
+            logger.exception(f'Connection error occurred: {ex}')
         except RequestException as ex:
             raise SystemExit(ex)
         except Exception as ex:
-            print(f">>> TBAPI POST REQUEST FAILURE: {ex}")
+            logger.exception(f">>> TBAPI POST REQUEST FAILURE: {ex}")
             raise
         return resp.json() if resp else {}
 
@@ -50,15 +50,15 @@ class TbApi:
         self._api = None
         self.baseURL = TbApiPathConfig.BASE_URI
         self.verify_ssl = None  # TODO: CA Bundle
-        self.delete = False
+        self.x_force_delete = False
         self.header = {}
         self._make_tb_api_headers()
 
     def _make_tb_api_headers(self):
         """Make trading bot api headers."""
         self.header = TbApiPathConfig.headers
-        if self.delete:
-            self.header.updte({'X-Force-Delete': 'true'})
+        if self.x_force_delete:
+            self.header.update({'X-Force-Delete': 'true'})
 
     @request_decorator
     def _api_request(self, method="get", endpoint="/", params=None,
@@ -134,7 +134,7 @@ class TbApi:
 
     def delete(self, endpoint, method="delete"):
         """Delete Request."""
-        self.delete = True
+        self.x_force_delete = True
         self._make_tb_api_headers()
         self.request(method, endpoint)
 
@@ -186,8 +186,13 @@ class TbApi:
         """Fetch cache events from TbApi."""
         endpoint = TbApiPathConfig.EVENTS_PATH
         query = query or {}
-        if securities and len(securities) < 80:
-            query.update({'security__in': json.dumps(securities)})
+        if securities:
+            logger.info(">>>> Length of securities: ", len(securities))
+            if len(securities) < 80:
+                query.update({'security__in': json.dumps(securities)})
+            else:
+                logger.debug(">>>> Length of securities is greater than "
+                             "permissible limit.")
         return self.get(endpoint, query=query)
 
     def get_most_traded_securities(self, key="totalTradedValue",
@@ -229,8 +234,18 @@ class TbApi:
                       "timestamp": datetime.now()}
                      for position in positions
                      if position["symbol"] not in cacheSecurities]
-        postPositions = PositionsSchema().dump(positions, many=True)
-        self.post(endpoint, data=postPositions)
+        if positions:
+            postPositions = PositionsSchema().dump(positions, many=True)
+            self.post(endpoint, data=postPositions)
+
+        updatePositions = {position["symbol"]: {**position,
+                                                "security": position["symbol"],
+                                                "onDate": datetime.today(),
+                                                "timestamp": datetime.now()}
+                           for position in positions
+                           if position["symbol"] in cacheSecurities}
+        if updatePositions:
+            self.update_positions(updatePositions)
 
     def update_orders(self, orders):
         """Update orders in TbApi."""
@@ -244,7 +259,7 @@ class TbApi:
         putOrders = OrdersSchema().dump(putOrders, many=True)
         self.put(endpoint, data=putOrders)
 
-    def update_positions(self, positions):
+    def update_positions(self, positions: Dict):
         """Update positions in TbApi."""
         endpoint = f"{TbApiPathConfig.POSITIONS}/{TODAY}"
         putPositions = [{**val,
