@@ -1,6 +1,6 @@
 """Base Collection."""
 
-from flask_mongoengine import Document
+from mongoengine import Document
 from flask_restful import abort
 
 from mongoengine.errors import NotUniqueError
@@ -9,7 +9,7 @@ from pymongo.errors import DuplicateKeyError
 BASE_META = {'strict': False,
              'ordered': True,
              'index_background': True,
-             'auto_create_index': False,
+             'auto_create_index': False,   # To avoid index creation on every insert
              'indexes': []}
 
 

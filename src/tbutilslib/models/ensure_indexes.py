@@ -45,4 +45,4 @@ def ensure_index():
     for item in COLL_INDEXES:
         collection = item['collection']
         index = item['index']
-        collection.ensure_index(index, unique=True)
+        collection.create_index(index, unique=True)
