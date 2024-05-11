@@ -5,18 +5,25 @@ from pymongo import MongoClient
 
 from app.config import MongoConfig, ApiConfig
 from app.errors import InvalidSecurityError
-from app.utils.common import EnumIndicator, TODAY, END_TIME, START_TIME, \
-    DATE_FORMAT, FULL_TS_FORMAT
+from app.utils.common import (
+    EnumIndicator,
+    TODAY,
+    END_TIME,
+    START_TIME,
+    DATE_FORMAT,
+    FULL_TS_FORMAT,
+)
 
 
 # from app.utils.common import is_trading_hours_open
 # TODAY = "12-02-2021"
 
+
 class Db:
-    def __init__(self, security='', collectionName=None):
+    def __init__(self, security="", collectionName=None):
         self.security = security.upper()
         self._collectionName = collectionName
-        self.query = {'security': self.security}
+        self.query = {"security": self.security}
 
     @property
     def collectionName(self):
@@ -33,8 +40,9 @@ class Db:
 
         return self._collectionName
 
-    def get(self, query, key='', sortFlag=False, ascend=True, projection=None,
-            distinct=None):
+    def get(
+        self, query, key="", sortFlag=False, ascend=True, projection=None, distinct=None
+    ):
         """
         Fetches the data from database collection as per the given query.
         """
@@ -58,16 +66,18 @@ class Db:
     @staticmethod
     def append_expiry_date(query, eDate):
         if eDate:
-            query.update({'expiryDate': datetime.strptime(eDate, DATE_FORMAT)})
+            query.update({"expiryDate": datetime.strptime(eDate, DATE_FORMAT)})
 
     @staticmethod
     def parse_dates_to_str(data, key, format=DATE_FORMAT):
-        return [{**item, key: item.get(key).strftime(format)}
-                for item in data]
+        return [{**item, key: item.get(key).strftime(format)} for item in data]
 
     @staticmethod
     def get_day_range():
-        gtTime, lsTime = f"{TODAY} {START_TIME}", f"{TODAY} {END_TIME}",
+        gtTime, lsTime = (
+            f"{TODAY} {START_TIME}",
+            f"{TODAY} {END_TIME}",
+        )
         return gtTime, lsTime
 
     @staticmethod
@@ -88,15 +98,14 @@ class Db:
         Get the derivatives data
         """
         gte = datetime.strptime(TODAY, DATE_FORMAT)
-        self.query.update({'timestamp': {"$gte": gte}})
+        self.query.update({"timestamp": {"$gte": gte}})
         if strikePrice:
-            self.query.update({'strikePrice': int(strikePrice)})
+            self.query.update({"strikePrice": int(strikePrice)})
         self.append_expiry_date(self.query, expiryDate)
         print(self.query)
         data = self.get(self.query, key="timestamp", sortFlag=True)
-        data = self.parse_dates_to_str(data, key='timestamp',
-                                       format=FULL_TS_FORMAT)
-        data = self.parse_dates_to_str(data, key='expiryDate')
+        data = self.parse_dates_to_str(data, key="timestamp", format=FULL_TS_FORMAT)
+        data = self.parse_dates_to_str(data, key="expiryDate")
         return data
 
     def get_cumulative_data(self, expiryDate=None):
@@ -105,13 +114,13 @@ class Db:
         """
         self._collectionName = MongoConfig.CUMULATIVE_DERIVATIVES
         self.query.update(
-            {'timestamp': {"$gte": datetime.strptime(TODAY, DATE_FORMAT)}})
+            {"timestamp": {"$gte": datetime.strptime(TODAY, DATE_FORMAT)}}
+        )
         self.append_expiry_date(self.query, expiryDate)
         # print(self.query)
         data = self.get(self.query)
-        data = self.parse_dates_to_str(data, key='timestamp',
-                                       format=FULL_TS_FORMAT)
-        data = self.parse_dates_to_str(data, key='expiryDate')
+        data = self.parse_dates_to_str(data, key="timestamp", format=FULL_TS_FORMAT)
+        data = self.parse_dates_to_str(data, key="expiryDate")
         # print(data[0])
         return data
 
@@ -121,11 +130,10 @@ class Db:
         Post current date.
         """
         key = "eventDate"
-        from_date = from_date or kwargs.get('from_date')
-        to_date = to_date or kwargs.get('to_date')
-        from_date = (datetime.strptime(from_date, '%d-%m-%Y')
-                     if from_date else from_date)
-        to_date = datetime.strptime(to_date, '%d-%m-%Y') if to_date else to_date
+        from_date = from_date or kwargs.get("from_date")
+        to_date = to_date or kwargs.get("to_date")
+        from_date = datetime.strptime(from_date, "%d-%m-%Y") if from_date else from_date
+        to_date = datetime.strptime(to_date, "%d-%m-%Y") if to_date else to_date
 
         if from_date and to_date:
             query = {key: {"$gte": from_date, "$lte": to_date}}
@@ -135,21 +143,18 @@ class Db:
             query = {key: {"$gte": TODAY}}
 
         data = self.get(query, key=key, sortFlag=True)
-        data = self.parse_dates_to_str(data, key='eventDate')
+        data = self.parse_dates_to_str(data, key="eventDate")
         return data
 
-    def get_last_value_of_security(self, security, key="timestamp",
-                                   projection=None):
+    def get_last_value_of_security(self, security, key="timestamp", projection=None):
         """
         Get the last value of the security from database.
         """
-        query = {'security': security}
+        query = {"security": security}
         projection = projection or {"_id": 0}
-        data = self.get(query=query,
-                        key=key,
-                        ascend=False,
-                        projection=projection,
-                        sortFlag=True)
+        data = self.get(
+            query=query, key=key, ascend=False, projection=projection, sortFlag=True
+        )
         return data[0][key]
 
     def get_max_oi(self, expiryDate=None, timeframe=3):
@@ -166,22 +171,30 @@ class Db:
         if expiryDate and isinstance(expiryDate, str):
             expiryDate = datetime.strptime(expiryDate, DATE_FORMAT)
         else:
-            expiryDate = datetime.strptime('25-02-2021', DATE_FORMAT)
+            expiryDate = datetime.strptime("25-02-2021", DATE_FORMAT)
         projection = {"_id": 0, "timestamp": 1}
-        latestTs = self.get_last_value_of_security(self.security,
-                                                   projection=projection)
+        latestTs = self.get_last_value_of_security(self.security, projection=projection)
 
-        self.query.update({
-            'timestamp': {"$gte": latestTs - timedelta(minutes=timeframe),
-                          "$lte": latestTs + timedelta(minutes=timeframe)},
-            'expiryDate': {"$eq": expiryDate}})
-        projection = {"_id": 0, "strikePrice": 1,
-                      "openInterest": 1, "optionType": 1}
-        data = self.get(query=self.query, projection=projection,
-                        key="openInterest", sortFlag=True, ascend=False)
+        self.query.update(
+            {
+                "timestamp": {
+                    "$gte": latestTs - timedelta(minutes=timeframe),
+                    "$lte": latestTs + timedelta(minutes=timeframe),
+                },
+                "expiryDate": {"$eq": expiryDate},
+            }
+        )
+        projection = {"_id": 0, "strikePrice": 1, "openInterest": 1, "optionType": 1}
+        data = self.get(
+            query=self.query,
+            projection=projection,
+            key="openInterest",
+            sortFlag=True,
+            ascend=False,
+        )
         # print(data)
-        peData = [datum for datum in data if datum.get('optionType') == "PE"]
-        ceData = [datum for datum in data if datum.get('optionType') == "CE"]
+        peData = [datum for datum in data if datum.get("optionType") == "PE"]
+        ceData = [datum for datum in data if datum.get("optionType") == "CE"]
         payload = {}
         if peData and ceData:
             payload = {
@@ -195,12 +208,10 @@ class Db:
         Get the next expiry dates for the security.
         """
         key = "expiryDate"
-        self.query.update(
-            {key: {"$gte": datetime.strptime(TODAY, DATE_FORMAT)}})
+        self.query.update({key: {"$gte": datetime.strptime(TODAY, DATE_FORMAT)}})
         # print(self.query)
         projection = {"_id": 0, key: 1}
-        data = self.get(query=self.query, projection=projection,
-                        distinct=True, key=key)
+        data = self.get(query=self.query, projection=projection, distinct=True, key=key)
         # print(data)
         payload = {}
         for pos, item in enumerate(data):
@@ -214,9 +225,9 @@ class Db:
     def get_equity_data(self, tsDate=None):
         dt = datetime.strptime(tsDate or TODAY, DATE_FORMAT)
         lte = dt + timedelta(days=1)
-        self.query.update({'timestamp': {"$gt": dt, "$lt": lte}})
+        self.query.update({"timestamp": {"$gt": dt, "$lt": lte}})
         data = self.get(self.query)
-        data = self.parse_dates_to_str(data, key='timestamp')
+        data = self.parse_dates_to_str(data, key="timestamp")
         return data
 
     def get_security_names_in_focus(self, tsDate=None):
@@ -228,7 +239,7 @@ class Db:
         key = "security"
         dt = datetime.strptime(tsDate or TODAY, DATE_FORMAT)
         lt = dt + timedelta(days=1)
-        query = {'timestamp': {"$gt": dt, "$lt": lt}}
+        query = {"timestamp": {"$gt": dt, "$lt": lt}}
         projection = {"_id": 0, key: 1}
         # print(query)
         data = self.get(query=query, projection=projection)

@@ -1,11 +1,12 @@
 """Import all collection models."""
 # flake8: noqa
-from ..models.nse.derivatives import (CumulativeDerivativesCollection,
-                                      EquityDerivatesCollection,
-                                      IndexDerivativesCollection,
-                                      HistoricalDerivatesCollection)
-from ..models.nse.equities import (NiftyEquityCollection,
-                                   AdvanceDeclineCollection)
+from ..models.nse.derivatives import (
+    CumulativeDerivativesCollection,
+    EquityDerivatesCollection,
+    IndexDerivativesCollection,
+    HistoricalDerivatesCollection,
+)
+from ..models.nse.equities import NiftyEquityCollection, AdvanceDeclineCollection
 from ..models.nse.events import EventsCollection
 from ..models.nse.security_in_focus import SecurityInFocusCollection
 from ..models.nse.fiidii import FiiDiiCollection

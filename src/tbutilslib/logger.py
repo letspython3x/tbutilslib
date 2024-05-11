@@ -5,8 +5,7 @@ from logging.handlers import TimedRotatingFileHandler
 
 from tbutilslib.utils.common import TODAY
 
-FORMATTER = logging.Formatter(
-    "%(asctime)s — %(name)s — %(levelname)s — %(message)s")
+FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
 LOG_FILE = f"TradingBot_{TODAY}.log"
 
 
@@ -18,7 +17,7 @@ def get_console_handler():
 
 def get_file_handler(log_file=None):
     log_file = log_file or LOG_FILE
-    file_handler = TimedRotatingFileHandler(log_file, when='midnight')
+    file_handler = TimedRotatingFileHandler(log_file, when="midnight")
     file_handler.setFormatter(FORMATTER)
     return file_handler
 

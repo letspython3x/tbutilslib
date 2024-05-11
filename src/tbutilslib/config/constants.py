@@ -3,9 +3,7 @@ from enum import Enum
 
 CE = "CE"
 PE = "PE"
-OPTIONS_TYPE = {"call": CE,
-                "put": PE,
-                "-": "futures"}
+OPTIONS_TYPE = {"call": CE, "put": PE, "-": "futures"}
 
 MARKET_NAMES = ["Capital Market", "Currency", "Commodity", "Debt"]
 
@@ -13,12 +11,14 @@ TB_DATE_FORMAT = "%d-%m-%Y"  # 21-01-2021
 NSE_DATE_FORMAT = "%d-%b-%Y"  # 21-sep-2021
 FULL_TS_FORMAT = "%d-%b-%Y %H:%M:%S"
 FULL_TS_FORMAT_TZ = "%Y-%m-%dT%H:%M:%S.%fZ"
-TB_DT_MAPPING = {'expiryDate': TB_DATE_FORMAT,
-                 'eventDate': TB_DATE_FORMAT,
-                 'onDate': TB_DATE_FORMAT,
-                 'date30dAgo': TB_DATE_FORMAT,
-                 'timestamp': FULL_TS_FORMAT,
-                 'lastUpdateTime': FULL_TS_FORMAT, }
+TB_DT_MAPPING = {
+    "expiryDate": TB_DATE_FORMAT,
+    "eventDate": TB_DATE_FORMAT,
+    "onDate": TB_DATE_FORMAT,
+    "date30dAgo": TB_DATE_FORMAT,
+    "timestamp": FULL_TS_FORMAT,
+    "lastUpdateTime": FULL_TS_FORMAT,
+}
 
 PERCENT_INDEX = 3
 PERCENT_EQUITY = 5

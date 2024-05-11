@@ -2,9 +2,11 @@
 from copy import deepcopy
 
 from mongoengine import fields as mongoFields
-from tbutilslib.config.constants import (FULL_TS_FORMAT,
-                                         TB_DATE_FORMAT,
-                                         FULL_TS_FORMAT_TZ)
+from tbutilslib.config.constants import (
+    FULL_TS_FORMAT,
+    TB_DATE_FORMAT,
+    FULL_TS_FORMAT_TZ,
+)
 from tbutilslib.config.database import MongoConfig
 from tbutilslib.models.base import BaseCollection, BASE_META
 
@@ -27,8 +29,8 @@ class CumulativeDerivativesCollection(BaseCollection):
     onDate = mongoFields.DateField(format=TB_DATE_FORMAT)
     expiryDate = mongoFields.DateField(format=TB_DATE_FORMAT)
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.CUMULATIVE_DERIVATIVES
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.CUMULATIVE_DERIVATIVES
 
 
 class DerivativesCommonFields:
@@ -73,16 +75,16 @@ class IndexDerivativesCollection(BaseCollection, DerivativesCommonFields):
     """INDEX_DERIVATIVES collection."""
 
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.INDEX_DERIVATIVES
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.INDEX_DERIVATIVES
 
 
 class EquityDerivatesCollection(BaseCollection, DerivativesCommonFields):
     """EQUITY_DERIVATIVES collection."""
 
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.EQUITY_DERIVATIVES
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.EQUITY_DERIVATIVES
 
 
 class HistoricalDerivatesCollection(BaseCollection):
@@ -111,5 +113,5 @@ class HistoricalDerivatesCollection(BaseCollection):
     timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT_TZ)
     positionType = mongoFields.StringField()
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.HISTORICAL_DERIVATIVES
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.HISTORICAL_DERIVATIVES

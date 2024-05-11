@@ -1,8 +1,10 @@
 """Derivatives Related Schema."""
 from marshmallow import Schema, fields, pre_load
-from tbutilslib.config.constants import (TB_DATE_FORMAT,
-                                         FULL_TS_FORMAT,
-                                         FULL_TS_FORMAT_TZ)
+from tbutilslib.config.constants import (
+    TB_DATE_FORMAT,
+    FULL_TS_FORMAT,
+    FULL_TS_FORMAT_TZ,
+)
 from tbutilslib.utils.common import parse_timestamp, validate_quantity
 
 

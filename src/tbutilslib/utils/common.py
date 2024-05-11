@@ -4,11 +4,14 @@ from datetime import datetime, timedelta, date
 from typing import List, Dict, Any
 
 from marshmallow import ValidationError
-from tbutilslib.config.constants import (TB_DATE_FORMAT,
-                                         START_TIME, END_TIME,
-                                         FULL_TS_FORMAT,
-                                         NSE_DATE_FORMAT,
-                                         TB_DT_MAPPING)
+from tbutilslib.config.constants import (
+    TB_DATE_FORMAT,
+    START_TIME,
+    END_TIME,
+    FULL_TS_FORMAT,
+    NSE_DATE_FORMAT,
+    TB_DT_MAPPING,
+)
 
 TODAY = datetime.today().strftime(TB_DATE_FORMAT)
 
@@ -23,8 +26,8 @@ def parse_timestamp(timestamp: str, format: str = FULL_TS_FORMAT) -> datetime:
     """
     return datetime.strptime(timestamp, format)
 
-def parse_timestamp_to_str(timestamp: datetime,
-                           format: str = FULL_TS_FORMAT) -> str:
+
+def parse_timestamp_to_str(timestamp: datetime, format: str = FULL_TS_FORMAT) -> str:
     """Convert a string timestamp to datetime.
 
     Args:
@@ -70,10 +73,13 @@ def parse_dates_to_str(dates: List[Dict]) -> List[Dict]:
     Returns: List[Dict]
     """
     data = dates if isinstance(dates, list) else [dates]
-    payload = [{key: (date_to_str(val, TB_DT_MAPPING[key])
-                      if key in TB_DT_MAPPING else val)
-                for key, val in datum.items()}
-               for datum in data]
+    payload = [
+        {
+            key: (date_to_str(val, TB_DT_MAPPING[key]) if key in TB_DT_MAPPING else val)
+            for key, val in datum.items()
+        }
+        for datum in data
+    ]
     return payload if isinstance(dates, list) else payload[0]
 
 
@@ -86,9 +92,11 @@ def parse_str_to_date(dateQuery: dict) -> dict:
     """
     newQuery = dateQuery.copy()
     for key, val in dateQuery.items():
-        newQuery[key] = (str_to_date(val, TB_DT_MAPPING[key])
-                         if key in TB_DT_MAPPING and isinstance(val, str)
-                         else val)
+        newQuery[key] = (
+            str_to_date(val, TB_DT_MAPPING[key])
+            if key in TB_DT_MAPPING and isinstance(val, str)
+            else val
+        )
     return newQuery
 
 
@@ -141,40 +149,39 @@ def filter_fno_securities(data: list = None) -> tuple:
     enabled.
     """
     print("Separate securities if FnO enabled...")
-    fno = list({item['security'] for item in data if item['fno']})
-    nonFno = list({item['security'] for item in data if not item['fno']})
+    fno = list({item["security"] for item in data if item["fno"]})
+    nonFno = list({item["security"] for item in data if not item["fno"]})
     print(f"Securities Separated-> FNO: {len(fno)} : NON-FNO: {len(nonFno)}")
     return fno, nonFno
 
 
 def parse_dates_to_str_old(data, key, format=TB_DATE_FORMAT):
     if data and key in data[0].keys():
-        return [{**item, key: item.get(key).strftime(format)}
-                for item in data]
+        return [{**item, key: item.get(key).strftime(format)} for item in data]
     return data
 
 
 def get_next_thursday(dt):
     print("\n" + "*" * 25)
     dayDict = {
-        'monday': 3,
-        'tuesday': 2,
-        'wednesday': 1,
-        'thursday': 0,
-        'friday': 6,
-        'saturday': 5,
-        'sunday': 4,
+        "monday": 3,
+        "tuesday": 2,
+        "wednesday": 1,
+        "thursday": 0,
+        "friday": 6,
+        "saturday": 5,
+        "sunday": 4,
     }
     dt = dt or datetime.today()
-    expectedDays = dayDict.get(dt.strftime('%A').lower())
-    nextDt = (dt + timedelta(days=expectedDays)).strftime('%d-%b-%Y')
+    expectedDays = dayDict.get(dt.strftime("%A").lower())
+    nextDt = (dt + timedelta(days=expectedDays)).strftime("%d-%b-%Y")
     # print(f"Expected Days: {expectedDays}")
     # print(f"Next Day: {nextDt}")
     return nextDt
 
 
-def liner(symbol='*', count=80):
-    return f'{symbol * count}'
+def liner(symbol="*", count=80):
+    return f"{symbol * count}"
 
 
 def is_trading_hours_open() -> bool:

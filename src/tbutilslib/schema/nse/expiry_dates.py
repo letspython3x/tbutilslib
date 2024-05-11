@@ -10,7 +10,9 @@ class ExpiryDatesSchema(Schema):
     id = fields.String(required=False)
     securityType = fields.String(required=True)
     expiryDates = fields.List(fields.Date(format=TB_DATE_FORMAT))
-    timestamp = fields.DateTime(format=FULL_TS_FORMAT, )
+    timestamp = fields.DateTime(
+        format=FULL_TS_FORMAT,
+    )
 
 
 class ExpiryDatesResponseSchema(Schema):

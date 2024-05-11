@@ -15,11 +15,11 @@ def request_decorator(func, *args, **kwargs):
             resp = func(*args, **kwargs)
             resp.raise_for_status()
         except HTTPError as ex:
-            print(f'HTTP error occurred: {ex}')
+            print(f"HTTP error occurred: {ex}")
         except (ReadTimeout, ReadTimeoutError) as ex:
-            print(f'Timeout error occurred: {ex}')
+            print(f"Timeout error occurred: {ex}")
         except ConnectionError as ex:
-            print(f'Connection error occurred: {ex}')
+            print(f"Connection error occurred: {ex}")
         except RequestException as ex:
             raise SystemExit(ex)
         except Exception as ex:
@@ -70,7 +70,5 @@ class TbApi:
     @request_decorator
     def delete(self, url, headers=None):
         headers = headers or {}
-        headers = {**headers,
-                   **TbApiPathConfig.headers,
-                   'X-Force-Delete': 'true'}
+        headers = {**headers, **TbApiPathConfig.headers, "X-Force-Delete": "true"}
         return self.session.delete(url, headers=headers)

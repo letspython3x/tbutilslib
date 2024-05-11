@@ -15,8 +15,7 @@ class SecurityInFocusCollection(BaseCollection):
     strikePrices = mFields.ListField(mFields.IntField())
     fno = mFields.BooleanField(default=False)
     onDate = mFields.DateField(format=TB_DATE_FORMAT, default=date.today())
-    timestamp = mFields.DateTimeField(format=FULL_TS_FORMAT,
-                                      default=datetime.now)
+    timestamp = mFields.DateTimeField(format=FULL_TS_FORMAT, default=datetime.now)
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.SECURITY_IN_FOCUS
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.SECURITY_IN_FOCUS

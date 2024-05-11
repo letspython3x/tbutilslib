@@ -14,9 +14,7 @@ from .. import errors
 from ..config.apiconfig import TbApiPathConfig
 from ..logger import get_logger
 from ..schema import OrdersSchema, PositionsSchema
-from ..utils.common import (TODAY,
-                            parse_timestamp,
-                            parse_timestamp_to_str)
+from ..utils.common import TODAY, parse_timestamp, parse_timestamp_to_str
 
 name = os.path.basename(__file__)
 logger = get_logger(name)
@@ -30,11 +28,11 @@ def request_decorator(func, *args, **kwargs):
             resp = func(*args, **kwargs)
             resp.raise_for_status()
         except HTTPError as ex:
-            logger.exception(f'HTTP error occurred: {ex}')
+            logger.exception(f"HTTP error occurred: {ex}")
         except (ReadTimeout, ReadTimeoutError) as ex:
-            logger.exception(f'Timeout error occurred: {ex}')
+            logger.exception(f"Timeout error occurred: {ex}")
         except ConnectionError as ex:
-            logger.exception(f'Connection error occurred: {ex}')
+            logger.exception(f"Connection error occurred: {ex}")
         except RequestException as ex:
             raise SystemExit(ex)
         except Exception as ex:
@@ -58,11 +56,19 @@ class TbApi:
         """Make trading bot api headers."""
         self.header = TbApiPathConfig.headers
         if self.x_force_delete:
-            self.header.update({'X-Force-Delete': 'true'})
+            self.header.update({"X-Force-Delete": "true"})
 
     @request_decorator
-    def _api_request(self, method="get", endpoint="/", params=None,
-                     data=None, retryCodes=None, maxRetries=30, retryWait=2):
+    def _api_request(
+        self,
+        method="get",
+        endpoint="/",
+        params=None,
+        data=None,
+        retryCodes=None,
+        maxRetries=30,
+        retryWait=2,
+    ):
         """Trading Bot api request."""
         valid = False
         attempt = 0
@@ -75,27 +81,33 @@ class TbApi:
             attempt += 1
             if method in ["post", "put"]:
                 response = getattr(requests, method)(
-                    url, json=data, headers=self.header,
-                    verify=self.verify_ssl)
+                    url, json=data, headers=self.header, verify=self.verify_ssl
+                )
             elif method == "get" and params:
                 response = getattr(requests, method)(
-                    url, headers=self.header,
-                    params=params, verify=self.verify_ssl)
+                    url, headers=self.header, params=params, verify=self.verify_ssl
+                )
             elif method in ["get", "delete"]:
                 response = getattr(requests, method)(
-                    url, headers=self.header,
-                    verify=self.verify_ssl)
+                    url, headers=self.header, verify=self.verify_ssl
+                )
             else:
                 logger.debug("method: {}".format(method))
                 raise ValueError("Requested method not supported.")
             if response.status_code not in (retryCodes or [429, 502, 503, 504]):
                 valid = True
                 if str(response.status_code)[0] in ("4", "5"):
-                    logger.debug("TradingBotAPI ERROR: {} - {} : {}".format(
-                        response.status_code, url, response.text))
+                    logger.debug(
+                        "TradingBotAPI ERROR: {} - {} : {}".format(
+                            response.status_code, url, response.text
+                        )
+                    )
                 else:
-                    logger.debug("TradingBotAPI response: {} - {}".format(
-                        response.status_code, url))
+                    logger.debug(
+                        "TradingBotAPI response: {} - {}".format(
+                            response.status_code, url
+                        )
+                    )
                 break
             if attempt > maxRetries:
                 break
@@ -108,7 +120,8 @@ class TbApi:
         """Trading Bot api request."""
         try:
             response = self._api_request(
-                method=method, endpoint=endpoint, data=data, params=params)
+                method=method, endpoint=endpoint, data=data, params=params
+            )
         except errors.TradingBotAPIException as e:
             raise errors.TradingBotAPIException(e)
         except ValueError as e:
@@ -118,7 +131,7 @@ class TbApi:
     def get(self, endpoint, method="get", query=None):
         """Get Request."""
         resp = self.request(method, endpoint, params=query)
-        return (resp or []) and resp.get('items', [])
+        return (resp or []) and resp.get("items", [])
 
     def post(self, endpoint, method="post", data=None):
         """Post Request."""
@@ -143,12 +156,13 @@ class TbApi:
         endpoint = f"{TbApiPathConfig.SECURITY_IN_FOCUS}/{onDate}"
         return self.get(endpoint)
 
-    def get_historical_derivatives(self,
-                                   security: str = None,
-                                   query: Dict = None):
+    def get_historical_derivatives(self, security: str = None, query: Dict = None):
         """Get Cache Historical Derivatives."""
-        endpoint = (f"{TbApiPathConfig.HISTORICAL_DERIVATIVES}/{security}" if
-                    security else TbApiPathConfig.HISTORICAL_DERIVATIVES)
+        endpoint = (
+            f"{TbApiPathConfig.HISTORICAL_DERIVATIVES}/{security}"
+            if security
+            else TbApiPathConfig.HISTORICAL_DERIVATIVES
+        )
         return self.get(endpoint, query=query)
 
     def get_investment(self):
@@ -189,22 +203,21 @@ class TbApi:
         if securities:
             logger.info(">>>> Length of securities: ", len(securities))
             if len(securities) < 80:
-                query.update({'security__in': json.dumps(securities)})
+                query.update({"security__in": json.dumps(securities)})
             else:
-                logger.debug(">>>> Length of securities is greater than "
-                             "permissible limit.")
+                logger.debug(
+                    ">>>> Length of securities is greater than " "permissible limit."
+                )
         return self.get(endpoint, query=query)
 
-    def get_most_traded_securities(self, key="totalTradedValue",
-                                   count=3, onDate=TODAY):
+    def get_most_traded_securities(self, key="totalTradedValue", count=3, onDate=TODAY):
         """Fetch most Traded securities from NSE."""
         endpoint = f"{TbApiPathConfig.EQUITY}/{onDate}"
         items = self.get(endpoint)
         items = [item for item in items if item["security"] != "NIFTY"]
         latestTs = max([parse_timestamp(item["timestamp"]) for item in items])
         latestTs = parse_timestamp_to_str(latestTs)
-        latestTsPayload = [item for item in items if
-                           item["timestamp"] == latestTs]
+        latestTsPayload = [item for item in items if item["timestamp"] == latestTs]
         latestTsPayload.sort(key=lambda x: x[key], reverse=True)
         return latestTsPayload[:count]
 
@@ -213,13 +226,17 @@ class TbApi:
         endpoint = f"{TbApiPathConfig.ORDERS}/{TODAY}"
         cacheOrders = self.get_orders()
         cacheOrderIds = {od["orderId"] for od in cacheOrders}
-        postOrders = [{**order,
-                       "security": order["symbol"],
-                       "limitPrice": order["lmtPrice"],
-                       "onDate": datetime.today(),
-                       "timestamp": datetime.now()}
-                      for order in orders
-                      if order["orderId"] not in cacheOrderIds]
+        postOrders = [
+            {
+                **order,
+                "security": order["symbol"],
+                "limitPrice": order["lmtPrice"],
+                "onDate": datetime.today(),
+                "timestamp": datetime.now(),
+            }
+            for order in orders
+            if order["orderId"] not in cacheOrderIds
+        ]
         postOrders = OrdersSchema().dump(postOrders, many=True)
         self.post(endpoint, data=postOrders)
 
@@ -228,44 +245,60 @@ class TbApi:
         endpoint = f"{TbApiPathConfig.POSITIONS}/{TODAY}"
         cachePositions = self.get_positions()
         cacheSecurities = {pos["security"] for pos in cachePositions}
-        positions = [{**position,
-                      "security": position["symbol"],
-                      "onDate": datetime.today(),
-                      "timestamp": datetime.now()}
-                     for position in positions
-                     if position["symbol"] not in cacheSecurities]
+        positions = [
+            {
+                **position,
+                "security": position["symbol"],
+                "onDate": datetime.today(),
+                "timestamp": datetime.now(),
+            }
+            for position in positions
+            if position["symbol"] not in cacheSecurities
+        ]
         if positions:
             postPositions = PositionsSchema().dump(positions, many=True)
             self.post(endpoint, data=postPositions)
 
-        updatePositions = {position["symbol"]: {**position,
-                                                "security": position["symbol"],
-                                                "onDate": datetime.today(),
-                                                "timestamp": datetime.now()}
-                           for position in positions
-                           if position["symbol"] in cacheSecurities}
+        updatePositions = {
+            position["symbol"]: {
+                **position,
+                "security": position["symbol"],
+                "onDate": datetime.today(),
+                "timestamp": datetime.now(),
+            }
+            for position in positions
+            if position["symbol"] in cacheSecurities
+        }
         if updatePositions:
             self.update_positions(updatePositions)
 
     def update_orders(self, orders):
         """Update orders in TbApi."""
         endpoint = f"{TbApiPathConfig.ORDERS}/{TODAY}"
-        putOrders = [{**val,
-                      "security": val["symbol"],
-                      "limitPrice": val["lmtPrice"],
-                      "onDate": datetime.today(),
-                      "timestamp": datetime.now()}
-                     for oid, val in orders.items()]
+        putOrders = [
+            {
+                **val,
+                "security": val["symbol"],
+                "limitPrice": val["lmtPrice"],
+                "onDate": datetime.today(),
+                "timestamp": datetime.now(),
+            }
+            for oid, val in orders.items()
+        ]
         putOrders = OrdersSchema().dump(putOrders, many=True)
         self.put(endpoint, data=putOrders)
 
     def update_positions(self, positions: Dict):
         """Update positions in TbApi."""
         endpoint = f"{TbApiPathConfig.POSITIONS}/{TODAY}"
-        putPositions = [{**val,
-                         "security": val["symbol"],
-                         "onDate": datetime.today(),
-                         "timestamp": datetime.now()}
-                        for val in positions.values()]
+        putPositions = [
+            {
+                **val,
+                "security": val["symbol"],
+                "onDate": datetime.today(),
+                "timestamp": datetime.now(),
+            }
+            for val in positions.values()
+        ]
         putPositions = PositionsSchema().dump(putPositions, many=True)
         self.put(endpoint, data=putPositions)

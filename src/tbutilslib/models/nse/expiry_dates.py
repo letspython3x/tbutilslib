@@ -11,9 +11,8 @@ class ExpiryDatesCollection(BaseCollection):
     """Expiry Dates Collection."""
 
     securityType = mongoFields.StringField(required=True)
-    expiryDates = mongoFields.ListField(
-        mongoFields.DateField(format=TB_DATE_FORMAT))
+    expiryDates = mongoFields.ListField(mongoFields.DateField(format=TB_DATE_FORMAT))
     timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT)
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.EXPIRY_DATES
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.EXPIRY_DATES

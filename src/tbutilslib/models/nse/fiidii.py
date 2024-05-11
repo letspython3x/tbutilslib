@@ -16,5 +16,5 @@ class FiiDiiCollection(BaseCollection):
     netValue = mongoFields.FloatField()
     onDate = mongoFields.DateField(format=TB_DATE_FORMAT)
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["+onDate"]
-    meta = {'collection': MongoConfig.FII_DII}
+    meta["ordering"] = ["+onDate"]
+    meta = {"collection": MongoConfig.FII_DII}

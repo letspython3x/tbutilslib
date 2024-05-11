@@ -8,8 +8,7 @@ class MongoConfig:
     MONGODB_DB = os.getenv("MONGODB_DB", "StockMarket")
     HOST = os.getenv("MONGODB_HOST", "127.0.0.1")
     PORT = os.getenv("MONGODB_PORT", 27017)
-    MONGODB_URI = os.getenv("MONGODB_URI",
-                            "mongodb://127.0.0.1:27017/StockMarket")
+    MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://127.0.0.1:27017/StockMarket")
     ADVANCE_DECLINE = "ADVANCE_DECLINE"
     CUMULATIVE_DERIVATIVES = "CUMULATIVE_DERIVATIVES"
     EQUITY_DERIVATIVES = "EQUITY_DERIVATIVES"

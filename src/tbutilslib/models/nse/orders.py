@@ -23,8 +23,7 @@ class OrdersCollection(BaseCollection):
     remaining = mongoFields.FloatField()
     avgFillPrice = mongoFields.FloatField()
     onDate = mongoFields.DateField(format=TB_DATE_FORMAT)
-    timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT,
-                                          default=datetime.now)
+    timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT, default=datetime.now)
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.ORDERS
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.ORDERS

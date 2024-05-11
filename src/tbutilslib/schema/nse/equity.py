@@ -1,11 +1,7 @@
 """Equity Related Schema."""
 from marshmallow import Schema, fields, pre_load
-from tbutilslib.config.constants import (FULL_TS_FORMAT,
-                                         NSE_DATE_FORMAT,
-                                         TB_DATE_FORMAT)
-from tbutilslib.utils.common import (parse_timestamp,
-                                     str_to_date,
-                                     validate_quantity)
+from tbutilslib.config.constants import FULL_TS_FORMAT, NSE_DATE_FORMAT, TB_DATE_FORMAT
+from tbutilslib.utils.common import parse_timestamp, str_to_date, validate_quantity
 
 
 class EquitySchema(Schema):
@@ -47,7 +43,7 @@ class EquitySchema(Schema):
         """
         ts = parse_timestamp(in_data["timestamp"])
         in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
-        date30dAgo = str_to_date(in_data['date30dAgo'], NSE_DATE_FORMAT)
+        date30dAgo = str_to_date(in_data["date30dAgo"], NSE_DATE_FORMAT)
         in_data["date30dAgo"] = date30dAgo.strftime(TB_DATE_FORMAT)
         return in_data
 

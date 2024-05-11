@@ -12,8 +12,7 @@ class TradingDatesCollection(BaseCollection):
 
     lastTradingDate = mongoFields.DateField(format=TB_DATE_FORMAT)
     currentTradingDate = mongoFields.DateField(format=TB_DATE_FORMAT)
-    timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT,
-                                          default=datetime.now)
+    timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT, default=datetime.now)
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.TRADING_DATES
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.TRADING_DATES

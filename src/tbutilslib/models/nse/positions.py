@@ -17,8 +17,7 @@ class PositionsCollection(BaseCollection):
     position = mongoFields.FloatField()
     avgCost = mongoFields.FloatField()
     onDate = mongoFields.DateField(format=TB_DATE_FORMAT)
-    timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT,
-                                          default=datetime.now)
+    timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT, default=datetime.now)
     meta = deepcopy(BASE_META)
-    meta['ordering'] = ["-timestamp"]
-    meta['collection'] = MongoConfig.POSITIONS
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.POSITIONS

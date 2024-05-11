@@ -23,7 +23,7 @@ class EventsSchema(Schema):
         Args:
             in_data: dict
         """
-        eventDate = str_to_date(in_data['eventDate'], NSE_DATE_FORMAT)
+        eventDate = str_to_date(in_data["eventDate"], NSE_DATE_FORMAT)
         in_data["eventDate"] = eventDate.strftime(TB_DATE_FORMAT)
         return in_data
 
