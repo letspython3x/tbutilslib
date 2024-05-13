@@ -1,4 +1,5 @@
 """Ensure Indexes."""
+
 from tbutilslib.models import (
     AdvanceDeclineCollection,
     CumulativeDerivativesCollection,
@@ -18,29 +19,29 @@ COLL_INDEXES = [
     {"collection": AdvanceDeclineCollection, "index": ["timestamp"]},
     {
         "collection": CumulativeDerivativesCollection,
-        "index": ["security", "expiryDate", "-timestamp"],
+        "index": ["security", "expiry_date", "-timestamp"],
     },
     {
         "collection": EquityDerivatesCollection,
-        "index": ["identifier", "expiryDate", "-timestamp"],
+        "index": ["identifier", "expiry_date", "-timestamp"],
     },
-    {"collection": ExpiryDatesCollection, "index": ["securityType", "-timestamp"]},
-    {"collection": EventsCollection, "index": ["security", "purpose", "-eventDate"]},
-    {"collection": FiiDiiCollection, "index": ["category", "-onDate"]},
+    {"collection": ExpiryDatesCollection, "index": ["security_type", "-timestamp"]},
+    {"collection": EventsCollection, "index": ["security", "purpose", "-event_date"]},
+    {"collection": FiiDiiCollection, "index": ["category", "-on_date"]},
     {
         "collection": HistoricalDerivatesCollection,
-        "index": ["security", "-onDate", "+expiryDate"],
+        "index": ["security", "-on_date", "+expiry_date"],
     },
     {
         "collection": IndexDerivativesCollection,
-        "index": ["identifier", "expiryDate", "-timestamp"],
+        "index": ["identifier", "expiry_date", "-timestamp"],
     },
-    {"collection": NiftyEquityCollection, "index": ["identifier", "-lastUpdateTime"]},
-    {"collection": SecurityInFocusCollection, "index": ["+security", "-onDate"]},
+    {"collection": NiftyEquityCollection, "index": ["identifier", "-last_update_time"]},
+    {"collection": SecurityInFocusCollection, "index": ["+security", "-on_date"]},
     {"collection": OrdersCollection, "index": ["+security", "-timestamp"]},
     {
         "collection": PositionsCollection,
-        "index": ["+security", "-onDate", "-timestamp"],
+        "index": ["+security", "-on_date", "-timestamp"],
     },
 ]
 

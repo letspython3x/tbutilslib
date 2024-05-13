@@ -1,11 +1,9 @@
 """Derivatives Related Schema."""
 from marshmallow import Schema, fields, pre_load
-from tbutilslib.config.constants import (
-    TB_DATE_FORMAT,
-    FULL_TS_FORMAT,
-    FULL_TS_FORMAT_TZ,
-)
-from tbutilslib.utils.common import parse_timestamp, validate_quantity
+
+from ...utils.common import validate_quantity
+from ...utils.dtu import parse_timestamp, change_date_format
+from ...utils.enums import DateFormatEnum
 
 
 class CumulativeDerivativesSchema(Schema):
@@ -13,29 +11,37 @@ class CumulativeDerivativesSchema(Schema):
 
     id = fields.String(required=False)
     security = fields.String(required=True)
-    spotPrice = fields.Float(validate=validate_quantity)
-    futurePrice = fields.Float(validate=validate_quantity)
-    totOiCe = fields.Float(validate=validate_quantity)
-    totVolCe = fields.Float(validate=validate_quantity)
-    totOiPe = fields.Float(validate=validate_quantity)
-    totVolPe = fields.Float(validate=validate_quantity)
-    pcrOi = fields.Float(validate=validate_quantity)
-    pcrVol = fields.Float(validate=validate_quantity)
-    totalOiFut = fields.Integer(validate=validate_quantity)
-    totalVolFut = fields.Integer(validate=validate_quantity)
-    expiryDate = fields.Date(TB_DATE_FORMAT)
-    onDate = fields.Date(TB_DATE_FORMAT)
-    timestamp = fields.DateTime(FULL_TS_FORMAT)
+    spot_price = fields.Float(validate=validate_quantity)
+    future_price = fields.Float(validate=validate_quantity)
+    total_open_interest_ce = fields.Float(validate=validate_quantity)
+    total_volume_ce = fields.Float(validate=validate_quantity)
+    total_open_interest_pe = fields.Float(validate=validate_quantity)
+    total_volume_pe = fields.Float(validate=validate_quantity)
+    pcr_open_interest = fields.Float(validate=validate_quantity)
+    pcr_volume = fields.Float(validate=validate_quantity)
+    total_open_interest_fut = fields.Integer(validate=validate_quantity)
+    total_volume_fut = fields.Integer(validate=validate_quantity)
+    expiry_date = fields.Date(DateFormatEnum.TB_DATE.value)
+    on_date = fields.Date(DateFormatEnum.TB_DATE.value)
+    timestamp = fields.DateTime(DateFormatEnum.FULL_TS.value)
 
     @pre_load
     def slugify_date(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key onDate.
+        """Set a new key on_date.
 
         Args:
             in_data: dict
         """
-        ts = parse_timestamp(in_data["timestamp"])
-        in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
+        if "timestamp" in in_data:
+            ts = parse_timestamp(in_data["timestamp"])
+            in_data["on_date"] = ts.date().strftime(DateFormatEnum.TB_DATE.value)
+
+        if "expiry_date" in in_data:
+            in_data["expiry_date"] = (
+                change_date_format(
+                    in_data["expiry_date"], DateFormatEnum.TB_DATE.value
+                ),
+            )
         return in_data
 
 
@@ -44,8 +50,8 @@ class CumulativeDerivativesResponseSchema(Schema):
 
     cumulative = fields.Boolean(default=True)
     security = fields.String()
-    totalItems = fields.Integer()
-    possibleKeys = fields.List(fields.String())
+    total_items = fields.Integer()
+    possible_keys = fields.List(fields.String())
     items = fields.List(fields.Nested(CumulativeDerivativesSchema))
 
 
@@ -61,47 +67,86 @@ class DerivativesSchemaCommonFields(Schema):
     id = fields.String(required=False)
     security = fields.String(required=True)
     identifier = fields.String()
-    optionType = fields.String()
-    lastPrice = fields.Float()
-    openInterest = fields.Integer(validate=validate_quantity)
-    impliedVolatility = fields.Float()
-    changeinOpenInterest = fields.Integer()
-    pchangeinOpenInterest = fields.Float()
+    option_type = fields.String()
+    last_price = fields.Float()
+    open_interest = fields.Integer(validate=validate_quantity)
+    implied_volatility = fields.Float()
+    change_in_open_interest = fields.Integer()
+    p_change_in_open_interest = fields.Float()
     change = fields.Float()
-    pChange = fields.Float()
-    strikePrice = fields.Float()
-    instrumentType = fields.String()
-    openPrice = fields.Float()
-    highPrice = fields.Float()
-    lowPrice = fields.Float()
-    closePrice = fields.Float()
-    prevClose = fields.Float()
-    numberOfContractsTraded = fields.Integer()
-    totalTurnover = fields.Float()
-    tradedVolume = fields.Integer(validate=validate_quantity)
+    p_change = fields.Float()
+    strike_price = fields.Float()
+    instrument_type = fields.String()
+    open_price = fields.Float()
+    high_price = fields.Float()
+    low_price = fields.Float()
+    close_price = fields.Float()
+    prev_close = fields.Float()
+    number_of_contracts_traded = fields.Integer()
+    total_turnover = fields.Float()
+    traded_volume = fields.Integer(validate=validate_quantity)
     value = fields.Float(validate=validate_quantity)
     vmap = fields.Float()
-    premiumTurnover = fields.Float()
-    marketLot = fields.Integer(validate=validate_quantity)
-    settlementPrice = fields.Float()
-    dailyvolatility = fields.Float()
-    annualisedVolatility = fields.Float()
-    clientWisePositionLimits = fields.Integer()
-    marketWidePositionLimits = fields.Integer()
-    spotPrice = fields.Float()
-    expiryDate = fields.Date(TB_DATE_FORMAT)
-    onDate = fields.Date(TB_DATE_FORMAT)
-    timestamp = fields.DateTime(FULL_TS_FORMAT)
+    premium_turnover = fields.Float()
+    market_lot = fields.Integer(validate=validate_quantity)
+    settlement_price = fields.Float()
+    daily_volatility = fields.Float()
+    annualised_volatility = fields.Float()
+    client_wise_position_limits = fields.Integer()
+    market_wide_position_limits = fields.Integer()
+    spot_price = fields.Float()
+    expiry_date = fields.Date(DateFormatEnum.TB_DATE.value)
+    on_date = fields.Date(DateFormatEnum.TB_DATE.value)
+    timestamp = fields.DateTime(DateFormatEnum.FULL_TS.value)
 
     @pre_load
     def slugify_date(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key onDate.
+        """Set a new key on_date."""
 
-        Args:
-            in_data: dict
-        """
-        ts = parse_timestamp(in_data["timestamp"])
-        in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
+        is_nse = in_data.get("is_nse")
+        if is_nse:
+            return {
+                "security": in_data["security"],
+                "identifier": in_data["identifier"],
+                "option_type": in_data["optionType"],
+                "last_price": in_data["lastPrice"],
+                "open_interest": in_data["openInterest"],
+                "implied_volatility": in_data["impliedVolatility"],
+                "change_in_open_interest": in_data["changeinOpenInterest"],
+                "p_change_in_open_interest": in_data["pchangeinOpenInterest"],
+                "change": in_data["change"],
+                "p_change": in_data["pChange"],
+                "strike_price": in_data["strikePrice"],
+                "instrument_type": in_data["instrumentType"],
+                "open_price": in_data["openPrice"],
+                "high_price": in_data["highPrice"],
+                "low_price": in_data["lowPrice"],
+                "close_price": in_data["closePrice"],
+                "prev_close": in_data["prevClose"],
+                "number_of_contracts_traded": in_data["numberOfContractsTraded"],
+                "total_turnover": in_data["totalTurnover"],
+                "traded_volume": in_data["tradedVolume"],
+                "value": in_data["value"],
+                "vmap": in_data["vmap"],
+                "premium_turnover": in_data["premiumTurnover"],
+                "market_lot": in_data["marketLot"],
+                "settlement_price": in_data["settlementPrice"],
+                "daily_volatility": in_data["dailyVolatility"],
+                "annualised_volatility": in_data["annualisedVolatility"],
+                "client_wise_position_limits": in_data["clientWisePositionLimits"],
+                "market_wide_position_limits": in_data["marketWidePositionLimits"],
+                "spot_price": in_data["spotPrice"],
+                "expiry_date": change_date_format(
+                    in_data["expiryDate"], DateFormatEnum.TB_DATE.value
+                ),
+                "on_date": change_date_format(
+                    in_data["onDate"], DateFormatEnum.TB_DATE.value
+                ),
+                "timestamp": change_date_format(
+                    in_data["timestamp"], DateFormatEnum.FULL_TS.value
+                ),
+            }
+
         return in_data
 
 
@@ -110,8 +155,8 @@ class DerivativesSchemaResponseCommonFields(Schema):
 
     derivatives = fields.Boolean(default=True)
     security = fields.String()
-    totalItems = fields.Integer()
-    possibleKeys = fields.List(fields.String())
+    total_items = fields.Integer()
+    possible_keys = fields.List(fields.String())
 
 
 class IndexDerivativesSchema(DerivativesSchemaCommonFields):
@@ -156,38 +201,70 @@ class HistoricalDerivativesSchema(Schema):
     id = fields.String(required=False)
     security = fields.String(required=True)
     instrument = fields.String()
-    marketType = fields.String()
-    marketLot = fields.Integer(validate=validate_quantity)
-    optionType = fields.String()
-    strikePrice = fields.Float()
-    openPrice = fields.Float()
-    closePrice = fields.Float()
-    highPrice = fields.Float()
-    lowPrice = fields.Float()
-    lastPrice = fields.Float()
-    settlePrice = fields.Float()
-    prevClosePrice = fields.Float()
-    tradedVolume = fields.Integer()
-    tradedValue = fields.Integer()
-    premiumValue = fields.Float()
-    openInterest = fields.Integer()
-    changeInOI = fields.Integer()
-    onDate = fields.Date(format=TB_DATE_FORMAT)
-    expiryDate = fields.Date(format=TB_DATE_FORMAT)
-    timestamp = fields.DateTime(format=FULL_TS_FORMAT_TZ)
-    positionType = fields.String()
+    market_type = fields.String()
+    market_lot = fields.Integer(validate=validate_quantity)
+    option_type = fields.String()
+    strike_price = fields.Float()
+    open_price = fields.Float()
+    close_price = fields.Float()
+    high_price = fields.Float()
+    low_price = fields.Float()
+    last_price = fields.Float()
+    settle_price = fields.Float()
+    prev_close_price = fields.Float()
+    traded_volume = fields.Integer()
+    traded_value = fields.Integer()
+    premium_value = fields.Float()
+    open_interest = fields.Integer()
+    change_in_open_interest = fields.Integer()
+    position_type = fields.String()
+    on_date = fields.Date(format=DateFormatEnum.TB_DATE.value)
+    expiry_date = fields.Date(format=DateFormatEnum.TB_DATE.value)
+    timestamp = fields.DateTime(format=DateFormatEnum.FULL_TS_TZ.value)
 
     @pre_load
     def slugify_data(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key onDate.
+        """Set a new key on_date.
 
         Args:
             in_data: dict
         """
-        marketLot = in_data["marketLot"]
-        if marketLot and marketLot != 0:
-            in_data["changeInOI"] = int(in_data["changeInOI"] / marketLot)
-            in_data["openInterest"] = int(in_data["openInterest"] / marketLot)
+        is_nse = in_data.get("is_nse")
+        if is_nse:
+            in_data = {
+                "security": in_data["security"],
+                "instrument": in_data["instrument"],
+                "market_type": in_data["marketType"],
+                "market_lot": in_data["marketLot"],
+                "option_type": in_data["optionType"],
+                "strike_price": in_data["strikePrice"],
+                "open_price": in_data["openPrice"],
+                "close_price": in_data["closePrice"],
+                "high_price": in_data["highPrice"],
+                "low_price": in_data["lowPrice"],
+                "last_price": in_data["lastPrice"],
+                "settle_price": in_data["settlePrice"],
+                "prev_close_price": in_data["prevClosePrice"],
+                "traded_volume": in_data["tradedVolume"],
+                "traded_value": in_data["tradedValue"],
+                "premium_value": in_data["premiumValue"],
+                "open_interest": in_data["openInterest"],
+                "change_in_open_interest": in_data["changeInOI"],
+                "position_type": in_data["positionType"],
+                "on_date": in_data["onDate"],
+                "expiry_date": change_date_format(
+                    in_data["expiryDate"], DateFormatEnum.TB_DATE.value
+                ),
+                "timestamp": change_date_format(
+                    in_data["timestamp"], DateFormatEnum.FULL_TS.value
+                ),
+            }
+
+        market_lot = in_data["market_lot"]
+        if market_lot and market_lot != 0:
+            in_data["change_in_oi"] = int(in_data["change_in_oi"] / market_lot)
+            in_data["open_interest"] = int(in_data["open_interest"] / market_lot)
+
         return in_data
 
 
@@ -196,16 +273,16 @@ class HistoricalDerivativesResponseSchema(Schema):
 
     derivatives = fields.Boolean(default=True)
     security = fields.String()
-    totalItems = fields.Integer()
-    possibleKeys = fields.List(fields.String())
+    total_items = fields.Integer()
+    possible_keys = fields.List(fields.String())
     items = fields.List(fields.Nested(HistoricalDerivativesSchema))
 
 
 class ExpiryDatesResponseSchema(Schema):
     """Expiry Dates Response Schema."""
 
-    expiryDates = fields.Boolean(default=True)
+    expiry_dates = fields.Boolean(default=True)
     security = fields.String()
-    totalItems = fields.Integer()
-    possibleKeys = fields.List(fields.String())
-    items = fields.List(fields.Date(format=TB_DATE_FORMAT))
+    total_items = fields.Integer()
+    possible_keys = fields.List(fields.String())
+    items = fields.List(fields.Date(format=DateFormatEnum.TB_DATE.value))

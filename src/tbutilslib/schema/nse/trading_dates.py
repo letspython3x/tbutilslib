@@ -2,22 +2,23 @@
 from datetime import datetime
 
 from marshmallow import Schema, fields
-from tbutilslib.config.constants import TB_DATE_FORMAT, FULL_TS_FORMAT
+
+from ...utils.enums import DateFormatEnum
 
 
 class TradingDatesSchema(Schema):
     """Trading Dates Schema."""
 
     id = fields.String(required=False)
-    lastTradingDate = fields.Date(TB_DATE_FORMAT)
-    currentTradingDate = fields.Date(TB_DATE_FORMAT)
-    timestamp = fields.DateTime(FULL_TS_FORMAT, default=datetime.now)
+    last_trading_date = fields.Date(DateFormatEnum.TB_DATE.value)
+    current_trading_date = fields.Date(DateFormatEnum.TB_DATE.value)
+    timestamp = fields.DateTime(DateFormatEnum.FULL_TS.value, default=datetime.now)
 
 
 class TradingDatesResponseSchema(Schema):
     """Trading Dates Response Schema."""
 
-    tradingDates = fields.Boolean(default=True)
-    possibleKeys = fields.List(fields.String())
-    totalItems = fields.Integer()
+    trading_dates = fields.Boolean(default=True)
+    possible_keys = fields.List(fields.String())
+    total_items = fields.Integer()
     items = fields.List(fields.Nested(TradingDatesSchema))

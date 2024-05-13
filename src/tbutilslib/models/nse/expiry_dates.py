@@ -2,17 +2,20 @@
 from copy import deepcopy
 
 from mongoengine import fields as mongoFields
-from tbutilslib.config.constants import TB_DATE_FORMAT, FULL_TS_FORMAT
-from tbutilslib.config.database import MongoConfig
-from tbutilslib.models.base import BaseCollection, BASE_META
+
+from ..base import BaseCollection, BASE_META
+from ...config import MongoConfig
+from ...utils.enums import DateFormatEnum
 
 
 class ExpiryDatesCollection(BaseCollection):
     """Expiry Dates Collection."""
 
-    securityType = mongoFields.StringField(required=True)
-    expiryDates = mongoFields.ListField(mongoFields.DateField(format=TB_DATE_FORMAT))
-    timestamp = mongoFields.DateTimeField(format=FULL_TS_FORMAT)
+    security_type = mongoFields.StringField(required=True)
+    expiry_dates = mongoFields.ListField(
+        mongoFields.DateField(format=DateFormatEnum.TB_DATE.value)
+    )
+    timestamp = mongoFields.DateTimeField(format=DateFormatEnum.FULL_TS.value)
     meta = deepcopy(BASE_META)
     meta["ordering"] = ["-timestamp"]
     meta["collection"] = MongoConfig.EXPIRY_DATES

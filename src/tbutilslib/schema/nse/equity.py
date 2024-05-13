@@ -1,7 +1,9 @@
 """Equity Related Schema."""
 from marshmallow import Schema, fields, pre_load
-from tbutilslib.config.constants import FULL_TS_FORMAT, NSE_DATE_FORMAT, TB_DATE_FORMAT
-from tbutilslib.utils.common import parse_timestamp, str_to_date, validate_quantity
+
+from ...utils.common import validate_quantity
+from ...utils.dtu import parse_timestamp, str_to_date
+from ...utils.enums import DateFormatEnum
 
 
 class EquitySchema(Schema):
@@ -9,42 +11,42 @@ class EquitySchema(Schema):
 
     id = fields.String(required=False)
     security = fields.String()
-    isFNOSec = fields.Bool()
-    lastPrice = fields.Float()
+    is_fno = fields.Bool()
+    last_price = fields.Float()
     identifier = fields.String()
     series = fields.String()
     open = fields.Float()
-    dayHigh = fields.Float()
-    dayLow = fields.Float()
-    previousClose = fields.Float()
+    day_high = fields.Float()
+    day_low = fields.Float()
+    previous_close = fields.Float()
     change = fields.Float()
-    pChange = fields.Float()
-    totalTradedVolume = fields.Integer(validate=validate_quantity)
-    totalTradedValue = fields.Float()
-    yearHigh = fields.Float()
-    yearLow = fields.Float()
-    nearWKH = fields.Float()
-    nearWKL = fields.Float()
-    perChange365d = fields.Float()
-    date30dAgo = fields.Date(format=TB_DATE_FORMAT)
-    perChange30d = fields.Float()
-    chart30dPath = fields.String()
-    chartTodayPath = fields.String()
-    timestamp = fields.DateTime(FULL_TS_FORMAT)
-    onDate = fields.Date(format=TB_DATE_FORMAT)
-    lastUpdateTime = fields.DateTime(FULL_TS_FORMAT)
+    p_change = fields.Float()
+    total_traded_volume = fields.Integer(validate=validate_quantity)
+    total_traded_value = fields.Float()
+    year_high = fields.Float()
+    year_low = fields.Float()
+    near_weak_high = fields.Float()
+    near_weak_low = fields.Float()
+    per_change_365d = fields.Float()
+    date_30d_ago = fields.Date(format=DateFormatEnum.TB_DATE.value)
+    per_change_30d = fields.Float()
+    chart_30d_path = fields.String()
+    chart_today_path = fields.String()
+    timestamp = fields.DateTime(DateFormatEnum.FULL_TS.value)
+    on_date = fields.Date(format=DateFormatEnum.TB_DATE.value)
+    last_update_time = fields.DateTime(DateFormatEnum.FULL_TS.value)
 
     @pre_load
     def slugify_date(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key onDate and update date format for date30dAgo.
+        """Set a new key on_date and update date format for date30dAgo.
 
         Args:
             in_data: dict
         """
         ts = parse_timestamp(in_data["timestamp"])
-        in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
-        date30dAgo = str_to_date(in_data["date30dAgo"], NSE_DATE_FORMAT)
-        in_data["date30dAgo"] = date30dAgo.strftime(TB_DATE_FORMAT)
+        in_data["on_date"] = ts.date().strftime(DateFormatEnum.TB_DATE.value)
+        date_30d_ago = str_to_date(in_data["date30dAgo"], DateFormatEnum.NSE_DATE.value)
+        in_data["date_30d_ago"] = date_30d_ago.strftime(DateFormatEnum.TB_DATE.value)
         return in_data
 
 
@@ -52,8 +54,8 @@ class EquityResponseSchema(Schema):
     """Equity Response Schema."""
 
     equity = fields.Boolean(default=True)
-    possibleKeys = fields.List(fields.String())
-    totalItems = fields.Integer()
+    possible_keys = fields.List(fields.String())
+    total_items = fields.Integer()
     items = fields.List(fields.Nested(EquitySchema))
 
 
@@ -70,24 +72,24 @@ class AdvanceDeclineSchema(Schema):
     advances = fields.Integer()
     declines = fields.Integer()
     unchanged = fields.Integer()
-    timestamp = fields.DateTime(FULL_TS_FORMAT)
-    onDate = fields.Date(TB_DATE_FORMAT)
+    timestamp = fields.DateTime(DateFormatEnum.FULL_TS.value)
+    on_date = fields.Date(DateFormatEnum.TB_DATE.value)
 
     @pre_load
     def slugify_date(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key onDate.
+        """Set a new key on_date.
 
         Args:
             in_data: dict
         """
         ts = parse_timestamp(in_data["timestamp"])
-        in_data["onDate"] = ts.date().strftime(TB_DATE_FORMAT)
+        in_data["on_date"] = ts.date().strftime(DateFormatEnum.TB_DATE.value)
         return in_data
 
 
 class AdvanceDeclineResponseSchema(Schema):
     """Advance Decline Response Schema."""
 
-    advanceDecline = fields.Boolean(default=True)
-    totalItems = fields.Integer()
+    advance_decline = fields.Boolean(default=True)
+    total_items = fields.Integer()
     items = fields.List(fields.Nested(AdvanceDeclineSchema))

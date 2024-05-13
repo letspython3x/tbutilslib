@@ -1,30 +1,37 @@
 """Events Schema."""
 from marshmallow import Schema, fields, pre_load
-from tbutilslib.config.constants import TB_DATE_FORMAT, NSE_DATE_FORMAT
-from tbutilslib.utils.common import str_to_date
+
+from ...utils.dtu import change_date_format
+from ...utils.enums import DateFormatEnum
 
 
 class EventsSchema(Schema):
     """Events Schema."""
 
     id = fields.String(required=False)
-    security = fields.String(required=True)
-    eventDate = fields.Date(required=True, format=TB_DATE_FORMAT)
-    index = fields.String(required=False, default="equities")
     company = fields.String()
-    purpose = fields.String()
     description = fields.String()
-    fno = fields.Bool(default=False)
+    event_date = fields.Date(required=True, format=DateFormatEnum.TB_DATE.value)
+    index = fields.String(required=False, default="equities")
+    is_fno = fields.Bool(default=False)
+    purpose = fields.String()
+    security = fields.String(required=True)
 
     @pre_load
-    def slugify_date(self, in_data: dict, **kwargs) -> dict:
-        """Update format for eventDate.
+    def marshal_nse(self, in_data: dict, **kwargs) -> dict:
+        is_nse = in_data.get("is_nse", False)
+        if is_nse:
+            return {
+                "security": in_data["symbol"],
+                "event_date": change_date_format(
+                    in_data["date"], DateFormatEnum.TB_DATE.value
+                ),
+                "company": in_data["company"],
+                "purpose": in_data["purpose"],
+                "description": in_data["bm_desc"],
+                "is_fno": in_data.get("is_fno", False),
+            }
 
-        Args:
-            in_data: dict
-        """
-        eventDate = str_to_date(in_data["eventDate"], NSE_DATE_FORMAT)
-        in_data["eventDate"] = eventDate.strftime(TB_DATE_FORMAT)
         return in_data
 
 
@@ -32,8 +39,8 @@ class EventsResponseSchema(Schema):
     """Events Response Schema."""
 
     events = fields.Boolean(default=True)
-    possibleKeys = fields.List(fields.String())
-    totalItems = fields.Int()
+    possible_keys = fields.List(fields.String())
+    total_items = fields.Int()
     items = fields.List(fields.Nested(EventsSchema))
 
 

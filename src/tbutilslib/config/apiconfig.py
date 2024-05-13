@@ -1,4 +1,5 @@
 """Config."""
+
 import os
 
 
@@ -57,17 +58,17 @@ class TbApiPathConfig:
     headers = {"Content-Type": "application/json; charset=utf-8"}
     BASE_URI = os.getenv("ENVIRONMENT", "http://0.0.0.0/api/v1/")
     EVENTS_PATH = "events"
-    SECURITY_IN_FOCUS = "securityInFocus"
-    MAX_OI = "maxOpenInterest"
-    EXPIRY_DATES = "expiryDates"
-    FII_DII = "fiidii"
-    ADV_DECLINE = "advanceDecline"
+    SECURITY_IN_FOCUS = "security_in_focus"
+    MAX_OI = "max_open_interest"
+    EXPIRY_DATES = "expiry_dates"
+    FII_DII = "fii_dii"
+    ADV_DECLINE = "advance_decline"
     INDEX_DERIVATIVES = "index/derivatives"
     EQUITY_DERIVATIVES = "equity/derivatives"
     CUMULATIVE_DERIVATIVES = "cumulative"
     HISTORICAL_DERIVATIVES = "historical/derivatives"
     EQUITY = "equity"
-    TRADING_DATES = "tradingDates"
+    TRADING_DATES = "trading_dates"
     ORDERS = "orders"
     POSITIONS = "positions"
 

@@ -3,7 +3,8 @@ import json
 import os
 import time
 from datetime import datetime
-from typing import Dict, List
+from logging import getLogger
+from typing import Dict, List, Optional
 from urllib.parse import urljoin
 
 import requests
@@ -12,12 +13,12 @@ from urllib3.exceptions import ReadTimeoutError
 
 from .. import errors
 from ..config.apiconfig import TbApiPathConfig
-from ..logger import get_logger
 from ..schema import OrdersSchema, PositionsSchema
-from ..utils.common import TODAY, parse_timestamp, parse_timestamp_to_str
+from ..utils.dtu import TODAY, parse_timestamp, parse_timestamp_to_str
+from ..utils.enums import SecurityTypeEnum
 
 name = os.path.basename(__file__)
-logger = get_logger(name)
+logger = getLogger("tbutilslib." + __name__)
 
 
 def request_decorator(func, *args, **kwargs):
@@ -28,16 +29,18 @@ def request_decorator(func, *args, **kwargs):
             resp = func(*args, **kwargs)
             resp.raise_for_status()
         except HTTPError as ex:
-            logger.exception(f"HTTP error occurred: {ex}")
+            logger.exception("HTTP error", exc_info=True)
         except (ReadTimeout, ReadTimeoutError) as ex:
-            logger.exception(f"Timeout error occurred: {ex}")
+            logger.exception("Timeout error", exc_info=True)
         except ConnectionError as ex:
-            logger.exception(f"Connection error occurred: {ex}")
+            logger.exception("Connection error", exc_info=True)
         except RequestException as ex:
+            logger.exception("Request error", exc_info=True)
             raise SystemExit(ex)
         except Exception as ex:
-            logger.exception(f">>> TBAPI POST REQUEST FAILURE: {ex}")
+            logger.exception("Unknown Api error", exc_info=True)
             raise
+
         return resp.json() if resp else {}
 
     return wrapper
@@ -45,11 +48,10 @@ def request_decorator(func, *args, **kwargs):
 
 class TbApi:
     def __init__(self):
-        self._api = None
-        self.baseURL = TbApiPathConfig.BASE_URI
-        self.verify_ssl = None  # TODO: CA Bundle
-        self.x_force_delete = False
-        self.header = {}
+        self.bse_url: str = TbApiPathConfig.BASE_URI
+        self.verify_ssl: Optional[bool] = None  # TODO: CA Bundle
+        self.x_force_delete: bool = False
+        self.header: dict = {}
         self._make_tb_api_headers()
 
     def _make_tb_api_headers(self):
@@ -61,21 +63,22 @@ class TbApi:
     @request_decorator
     def _api_request(
         self,
-        method="get",
-        endpoint="/",
-        params=None,
-        data=None,
-        retryCodes=None,
-        maxRetries=30,
-        retryWait=2,
+        method: str = "get",
+        endpoint: str = "/",
+        params: Optional[dict] = None,
+        data: Optional[list] = None,
+        retry_codes: Optional[int] = None,
+        max_retries: int = 3,
+        retry_wait: int = 2,
     ):
         """Trading Bot api request."""
-        valid = False
-        attempt = 0
-        method = method.lower()
-        params = params or {}
-        url = urljoin(self.baseURL, endpoint)
-        data = data or {}
+
+        valid: bool = False
+        attempt: int = 0
+        method: str = method.lower()
+        params: dict = params or {}
+        url: str = urljoin(self.bse_url, endpoint)
+        data: dict = data or {}
 
         while True:
             attempt += 1
@@ -92,68 +95,79 @@ class TbApi:
                     url, headers=self.header, verify=self.verify_ssl
                 )
             else:
-                logger.debug("method: {}".format(method))
-                raise ValueError("Requested method not supported.")
-            if response.status_code not in (retryCodes or [429, 502, 503, 504]):
+                logger.info("Requested method %s not supported.", method)
+                raise ValueError("Requested method %s not supported." % method)
+            if response.status_code not in (retry_codes or [429, 502, 503, 504]):
                 valid = True
                 if str(response.status_code)[0] in ("4", "5"):
-                    logger.debug(
+                    logger.info(
                         "TradingBotAPI ERROR: {} - {} : {}".format(
                             response.status_code, url, response.text
                         )
                     )
                 else:
-                    logger.debug(
+                    logger.info(
                         "TradingBotAPI response: {} - {}".format(
                             response.status_code, url
                         )
                     )
                 break
-            if attempt > maxRetries:
+            if attempt > max_retries:
                 break
-            time.sleep(retryWait)
+            time.sleep(retry_wait)
         if valid:
             return response
+
         raise errors.TradingBotAPIException("Unable to get response from TBAPI")
 
-    def request(self, method, endpoint, data=None, params=None):
+    def request(
+        self,
+        method: str,
+        endpoint: str,
+        data: Optional[list | dict] = None,
+        params: Optional[dict] = None,
+    ):
         """Trading Bot api request."""
         try:
             response = self._api_request(
                 method=method, endpoint=endpoint, data=data, params=params
             )
         except errors.TradingBotAPIException as e:
-            raise errors.TradingBotAPIException(e)
+            logger.info("TradingBotAPIException: %s", e.message, exc_info=True)
+            raise errors.TradingBotAPIException(e.message)
+
         except ValueError as e:
-            raise errors.TradingBotAPIException(e)
+            logger.info("ValueError: ", exc_info=True)
+            raise errors.TradingBotAPIException(str(e))
+
         return response
 
-    def get(self, endpoint, method="get", query=None):
+    def get(self, endpoint: str, query: Optional[dict] = None) -> Optional[dict]:
         """Get Request."""
-        resp = self.request(method, endpoint, params=query)
-        return (resp or []) and resp.get("items", [])
+        resp = self.request("get", endpoint, params=query)
+        return resp
 
-    def post(self, endpoint, method="post", data=None):
+    def post(self, endpoint: str, data: list | dict):
         """Post Request."""
-        self.request(method, endpoint, data=data)
+        self.request("post", endpoint, data=data)
 
-    def put(self, endpoint, method="put", data=None):
+    def put(self, endpoint, data: list | dict):
         """Put Request."""
         if isinstance(data, dict):
-            self.request(method, endpoint, data=data)
+            self.request("put", endpoint, data=data)
         elif isinstance(data, list):
             for datum in data:
-                self.request(method, endpoint, data=datum)
+                self.request("put", endpoint, data=datum)
 
-    def delete(self, endpoint, method="delete"):
+    def delete(self, endpoint: str):
         """Delete Request."""
         self.x_force_delete = True
         self._make_tb_api_headers()
-        self.request(method, endpoint)
+        self.request("delete", endpoint)
 
-    def get_security_in_focus(self, onDate=TODAY):
+    def get_security_in_focus(self, on_date: str = TODAY):
         """Fetch cache security in focus from TbApi."""
-        endpoint = f"{TbApiPathConfig.SECURITY_IN_FOCUS}/{onDate}"
+        endpoint = f"{TbApiPathConfig.SECURITY_IN_FOCUS}/{on_date}"
         return self.get(endpoint)
 
     def get_historical_derivatives(self, security: str = None, query: Dict = None):
@@ -172,8 +186,9 @@ class TbApi:
 
     def get_past_trading_dates(self, count: int):
         """Fetch past trading dates from TbApi."""
-        fiiDii = self.get_investment()
-        dates = list({item["onDate"] for item in fiiDii})
+
+        fii_dii = self.get_investment()
+        dates = list({item["on_date"] for item in fii_dii})
         return dates[:count]
 
     def get_trading_dates(self):
@@ -181,124 +196,133 @@ class TbApi:
         endpoint = TbApiPathConfig.TRADING_DATES
         return self.get(endpoint)
 
-    def get_orders(self, onDate=TODAY):
+    def get_orders(self, on_date: str = TODAY):
         """Fetch cache Orders from TbApi."""
-        endpoint = f"{TbApiPathConfig.ORDERS}/{onDate}"
+        endpoint = f"{TbApiPathConfig.ORDERS}/{on_date}"
         return self.get(endpoint)
 
-    def get_positions(self, onDate=TODAY):
+    def get_positions(self, on_date: str = TODAY):
         """Fetch cache Orders from TbApi."""
-        endpoint = f"{TbApiPathConfig.POSITIONS}/{onDate}"
+        endpoint = f"{TbApiPathConfig.POSITIONS}/{on_date}"
         return self.get(endpoint)
 
-    def get_expiry_dates(self, securityType="equity"):
+    def get_expiry_dates(self, security_type: str = SecurityTypeEnum.EQUITY.value):
         """Fetch cache Orders from TbApi."""
-        endpoint = f"{TbApiPathConfig.EXPIRY_DATES}/{securityType.lower()}"
+
+        endpoint = f"{TbApiPathConfig.EXPIRY_DATES}/{security_type.lower()}"
         return self.get(endpoint)
 
-    def get_events(self, query: Dict = None, securities: List = None):
+    def get_events(
+        self, query: Optional[dict] = None, securities: Optional[list] = None
+    ):
         """Fetch cache events from TbApi."""
+
         endpoint = TbApiPathConfig.EVENTS_PATH
         query = query or {}
         if securities:
-            logger.info(">>>> Length of securities: ", len(securities))
+            logger.info("Events Count of securities: %d ", len(securities))
             if len(securities) < 80:
                 query.update({"security__in": json.dumps(securities)})
             else:
-                logger.debug(
-                    ">>>> Length of securities is greater than " "permissible limit."
-                )
+                logger.info("Count of securities is greater than permissible limit.")
         return self.get(endpoint, query=query)
 
-    def get_most_traded_securities(self, key="totalTradedValue", count=3, onDate=TODAY):
+    def get_most_traded_securities(
+        self, key: str = "totalTradedValue", count: int = 3, on_date: str = TODAY
+    ):
         """Fetch most Traded securities from NSE."""
-        endpoint = f"{TbApiPathConfig.EQUITY}/{onDate}"
+
+        endpoint = f"{TbApiPathConfig.EQUITY}/{on_date}"
         items = self.get(endpoint)
         items = [item for item in items if item["security"] != "NIFTY"]
-        latestTs = max([parse_timestamp(item["timestamp"]) for item in items])
-        latestTs = parse_timestamp_to_str(latestTs)
-        latestTsPayload = [item for item in items if item["timestamp"] == latestTs]
-        latestTsPayload.sort(key=lambda x: x[key], reverse=True)
-        return latestTsPayload[:count]
+        latest_ts = max([parse_timestamp(item["timestamp"]) for item in items])
+        latest_ts = parse_timestamp_to_str(latest_ts)
+        latest_ts_payload = [item for item in items if item["timestamp"] == latest_ts]
+        latest_ts_payload.sort(key=lambda x: x[key], reverse=True)
+        return latest_ts_payload[:count]
 
-    def save_orders(self, orders: List[Dict]):
+    def save_orders(self, orders: list[dict]):
         """Save orders to TbApi."""
+
         endpoint = f"{TbApiPathConfig.ORDERS}/{TODAY}"
-        cacheOrders = self.get_orders()
-        cacheOrderIds = {od["orderId"] for od in cacheOrders}
-        postOrders = [
+        cache_orders = self.get_orders()
+        cache_order_ids = {od["orderId"] for od in cache_orders}
+        post_orders = [
             {
                 **order,
                 "security": order["symbol"],
-                "limitPrice": order["lmtPrice"],
-                "onDate": datetime.today(),
+                "limit_price": order["lmtPrice"],
+                "on_date": datetime.today(),
                 "timestamp": datetime.now(),
             }
             for order in orders
-            if order["orderId"] not in cacheOrderIds
+            if order["orderId"] not in cache_order_ids
         ]
-        postOrders = OrdersSchema().dump(postOrders, many=True)
-        self.post(endpoint, data=postOrders)
+        post_orders = OrdersSchema().dump(post_orders, many=True)
+        self.post(endpoint, data=post_orders)
 
     def save_positions(self, positions: List[Dict]):
         """Save positions to TbApi."""
+
         endpoint = f"{TbApiPathConfig.POSITIONS}/{TODAY}"
-        cachePositions = self.get_positions()
-        cacheSecurities = {pos["security"] for pos in cachePositions}
+        cache_positions = self.get_positions()
+        cache_securities = {pos["security"] for pos in cache_positions}
         positions = [
             {
                 **position,
                 "security": position["symbol"],
-                "onDate": datetime.today(),
+                "on_date": datetime.today(),
                 "timestamp": datetime.now(),
             }
             for position in positions
-            if position["symbol"] not in cacheSecurities
+            if position["symbol"] not in cache_securities
         ]
         if positions:
-            postPositions = PositionsSchema().dump(positions, many=True)
-            self.post(endpoint, data=postPositions)
+            post_positions = PositionsSchema().dump(positions, many=True)
+            self.post(endpoint, data=post_positions)
 
-        updatePositions = {
+        update_positions = {
             position["symbol"]: {
                 **position,
                 "security": position["symbol"],
-                "onDate": datetime.today(),
+                "on_date": datetime.today(),
                 "timestamp": datetime.now(),
             }
             for position in positions
-            if position["symbol"] in cacheSecurities
+            if position["symbol"] in cache_securities
         }
-        if updatePositions:
-            self.update_positions(updatePositions)
+        if update_positions:
+            self.update_positions(update_positions)
 
     def update_orders(self, orders):
         """Update orders in TbApi."""
+
         endpoint = f"{TbApiPathConfig.ORDERS}/{TODAY}"
-        putOrders = [
+        put_orders = [
             {
                 **val,
                 "security": val["symbol"],
-                "limitPrice": val["lmtPrice"],
-                "onDate": datetime.today(),
+                "limit_price": val["lmtPrice"],
+                "on_date": datetime.today(),
                 "timestamp": datetime.now(),
             }
             for oid, val in orders.items()
         ]
-        putOrders = OrdersSchema().dump(putOrders, many=True)
-        self.put(endpoint, data=putOrders)
+        put_orders = OrdersSchema().dump(put_orders, many=True)
+        self.put(endpoint, data=put_orders)
 
     def update_positions(self, positions: Dict):
         """Update positions in TbApi."""
+
         endpoint = f"{TbApiPathConfig.POSITIONS}/{TODAY}"
-        putPositions = [
+        put_positions = [
             {
                 **val,
                 "security": val["symbol"],
-                "onDate": datetime.today(),
+                "on_date": datetime.today(),
                 "timestamp": datetime.now(),
             }
             for val in positions.values()
         ]
-        putPositions = PositionsSchema().dump(putPositions, many=True)
-        self.put(endpoint, data=putPositions)
+        put_positions = PositionsSchema().dump(put_positions, many=True)
+        self.put(endpoint, data=put_positions)

@@ -1,10 +1,12 @@
 """Base Collection."""
+from logging import getLogger
 
-from mongoengine import Document
 from flask_restful import abort
-
+from mongoengine import Document
 from mongoengine.errors import NotUniqueError
 from pymongo.errors import DuplicateKeyError
+
+logger = getLogger("tbutilslib." + __name__)
 
 BASE_META = {
     "strict": False,
@@ -48,4 +50,5 @@ class BaseCollection(Document):
                 **kwargs
             )
         except (NotUniqueError, DuplicateKeyError):
+            logger.info("Error: Duplicate, record already exists")
             raise abort(409, message="Record Exists Duplicate Entry.")

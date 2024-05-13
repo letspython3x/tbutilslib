@@ -1,14 +1,14 @@
 """MaxOI Schema."""
 from marshmallow import Schema, fields
 
-from tbutilslib.config.constants import TB_DATE_FORMAT
+from ...utils.enums import DateFormatEnum
 
 
 class MaxOiDatumSchema(Schema):
     """MaxOI Datum Schema."""
 
-    openInterest = fields.Integer()
-    strikePrice = fields.Integer()
+    open_interest = fields.Integer()
+    strike_price = fields.Integer()
 
 
 class MaxOpenInterestSchema(Schema):
@@ -21,10 +21,10 @@ class MaxOpenInterestSchema(Schema):
 class MaxOpenInterestResponseSchema(Schema):
     """MaxOI Response Schema."""
 
-    maxOpenInterest = fields.Boolean(default=True)
+    max_open_interest = fields.Boolean(default=True)
     security = fields.String()
-    expiryDate = fields.Date(TB_DATE_FORMAT)
-    possibleKeys = fields.List(fields.String())
+    expiry_date = fields.Date(DateFormatEnum.TB_DATE.value)
+    possible_keys = fields.List(fields.String())
     items = fields.Nested(MaxOpenInterestSchema)
 
 

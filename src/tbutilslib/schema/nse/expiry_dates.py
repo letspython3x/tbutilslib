@@ -1,24 +1,22 @@
 """Expiry Dates Collection."""
 
 from marshmallow import Schema, fields
-from tbutilslib.config.constants import TB_DATE_FORMAT, FULL_TS_FORMAT
+from ...utils.enums import DateFormatEnum
 
 
 class ExpiryDatesSchema(Schema):
     """Expiry Dates Schema."""
 
     id = fields.String(required=False)
-    securityType = fields.String(required=True)
-    expiryDates = fields.List(fields.Date(format=TB_DATE_FORMAT))
-    timestamp = fields.DateTime(
-        format=FULL_TS_FORMAT,
-    )
+    security_type = fields.String(required=True)
+    expiry_dates = fields.List(fields.Date(format=DateFormatEnum.TB_DATE.value))
+    timestamp = fields.DateTime(format=DateFormatEnum.FULL_TS.value)
 
 
 class ExpiryDatesResponseSchema(Schema):
     """Expiry Dates Response Schema."""
 
-    expiryDates = fields.Boolean(default=True)
-    possibleKeys = fields.List(fields.String())
-    totalItems = fields.Integer()
+    expiry_dates = fields.Boolean(default=True)
+    possible_keys = fields.List(fields.String())
+    total_items = fields.Integer()
     items = fields.List(fields.Nested(ExpiryDatesSchema))

@@ -2,9 +2,10 @@
 from copy import deepcopy
 
 from mongoengine import fields as mongoFields
-from tbutilslib.config.constants import TB_DATE_FORMAT
-from tbutilslib.config.database import MongoConfig
-from tbutilslib.models.base import BaseCollection, BASE_META
+
+from ..base import BaseCollection, BASE_META
+from ...config import MongoConfig
+from ...utils.enums import DateFormatEnum
 
 
 class EventsCollection(BaseCollection):
@@ -15,8 +16,10 @@ class EventsCollection(BaseCollection):
     company = mongoFields.StringField()
     purpose = mongoFields.StringField()
     description = mongoFields.StringField()
-    eventDate = mongoFields.DateField(required=True, format=TB_DATE_FORMAT)
-    fno = mongoFields.BooleanField()
+    event_date = mongoFields.DateField(
+        required=True, format=DateFormatEnum.TB_DATE.value
+    )
+    is_fno = mongoFields.BooleanField()
     meta = deepcopy(BASE_META)
-    meta["ordering"] = ["-eventDate"]
+    meta["ordering"] = ["-event_date"]
     meta = {"collection": MongoConfig.EVENTS}
