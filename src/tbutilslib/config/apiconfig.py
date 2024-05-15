@@ -16,19 +16,21 @@ class NseApiConfig:
     }
     BASE_URL = "https://www.nseindia.com/"
     BASE_PATH = "https://www.nseindia.com/api/"
-    # EQUITY_OC_PATH = "quote-derivative?symbol={}"
     QUOTE_DERIVATIVES = "quote-derivative?symbol={}"
     HISTORY_DERIVATIVES = "historical/fo/derivatives"
     EQUITY_QUOTE = "quote-equity?symbol={}"
     EQUITY_PATH = "{}"  # TO BE FILLED IN
     EVENT_CALENDAR_PATH = "event-calendar"
     FII_DII = "fiidiiTradeReact"
+
     # MARKET DATA
     NIFTY_EQUITIES_PATH = "equity-stockIndices?index=NIFTY%2050"
     MARKET_STATUS = "marketStatus"
     INDEXES = ["NIFTY", "BANKNIFTY"]
+
     # Not using currently
     INDEX_OC_PATH = "option-chain-indices?symbol={}"
+    EQUITY_OC_PATH = "quote-derivative?symbol={}"
 
 
 class TbApiConfig:
@@ -56,16 +58,16 @@ class TbApiPathConfig:
     """Trading Bot Api Path Config."""
 
     headers = {"Content-Type": "application/json; charset=utf-8"}
-    BASE_URI = os.getenv("ENVIRONMENT", "http://0.0.0.0/api/v1/")
+    BASE_URI = os.getenv("ENVIRONMENT", "http://127.0.0.1:9000/api/v1/")
     EVENTS_PATH = "events"
     SECURITY_IN_FOCUS = "security_in_focus"
     MAX_OI = "max_open_interest"
     EXPIRY_DATES = "expiry_dates"
     FII_DII = "fii_dii"
     ADV_DECLINE = "advance_decline"
-    INDEX_DERIVATIVES = "index/derivatives"
-    EQUITY_DERIVATIVES = "equity/derivatives"
-    CUMULATIVE_DERIVATIVES = "cumulative"
+    INDEX_DERIVATIVES = "index/derivatives/{}"
+    EQUITY_DERIVATIVES = "equity/derivatives/{}"
+    CUMULATIVE_DERIVATIVES = "cumulative/{}"
     HISTORICAL_DERIVATIVES = "historical/derivatives"
     EQUITY = "equity"
     TRADING_DATES = "trading_dates"
