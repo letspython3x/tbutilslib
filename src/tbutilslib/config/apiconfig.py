@@ -30,7 +30,7 @@ class NseApiConfig:
 
     # Not using currently
     INDEX_OC_PATH = "option-chain-indices?symbol={}"
-    EQUITY_OC_PATH = "quote-derivative?symbol={}"
+    EQUITY_OC_PATH = "option-chain-equities?symbol={}"
 
 
 class TbApiConfig:

@@ -131,14 +131,17 @@ class DerivativesSchemaCommonFields(Schema):
                 "premium_turnover": in_data["premiumTurnover"],
                 "market_lot": in_data["marketLot"],
                 "settlement_price": in_data["settlementPrice"],
-                "daily_volatility": in_data["dailyVolatility"],
+                "daily_volatility": in_data.get("dailyVolatility")
+                or in_data.get("dailyvolatility"),
                 "annualised_volatility": in_data["annualisedVolatility"],
                 "client_wise_position_limits": in_data["clientWisePositionLimits"],
                 "market_wide_position_limits": in_data["marketWidePositionLimits"],
-                "spot_price": in_data["spotPrice"],
+                "spot_price": in_data.get("spotPrice")
+                or in_data.get("underlyingValue"),
                 "expiry_date": change_date_format(
                     in_data["expiryDate"], DateFormatEnum.TB_DATE.value
                 ),
+                # TODO: Check onDate to fetch from timestamp
                 "on_date": change_date_format(
                     in_data["onDate"], DateFormatEnum.TB_DATE.value
                 ),
