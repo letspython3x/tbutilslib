@@ -64,3 +64,15 @@ class WeekDayEnum(Enum):
     FRIDAY = 4
     SATURDAY = 5
     SUNDAY = 6
+
+
+class FiiDiiCategoryEnum(Enum):
+    CASH = "CASH"
+    INDEX_FUT = "INDEX FUT"
+    INDEX_OPT = "INDEX OPT"
+    STOCK_FUT = "STOCK FUT"
+    STOCK_OPT = "STOCK OPT"
+    MF_EQUITY = "MF EQUITY"
+    MF_DEBT = "MF DEBT"
+    FII_EQUITY = "FII EQUITY"
+    FII_DEBT = "FII DEBT"

@@ -13,7 +13,6 @@ class EventsSchema(Schema):
     description = fields.String()
     event_date = fields.Date(required=True, format=DateFormatEnum.TB_DATE.value)
     index = fields.String(required=False, default="equities")
-    is_fno = fields.Bool(default=False)
     purpose = fields.String()
     security = fields.String(required=True)
 
@@ -30,7 +29,6 @@ class EventsSchema(Schema):
                 "company": in_data["company"],
                 "purpose": in_data["purpose"],
                 "description": in_data["bm_desc"],
-                "is_fno": in_data.get("is_fno", False),
             }
 
         return in_data

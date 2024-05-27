@@ -19,7 +19,6 @@ class EventsCollection(BaseCollection):
     event_date = mongoFields.DateField(
         required=True, format=DateFormatEnum.TB_DATE.value
     )
-    is_fno = mongoFields.BooleanField()
     meta = deepcopy(BASE_META)
     meta["ordering"] = ["-event_date"]
     meta = {"collection": MongoConfig.EVENTS}
