@@ -16,7 +16,7 @@ class CumulativeDerivativesCollection(BaseCollection):
     spot_price = mongoFields.FloatField()
     future_price = mongoFields.FloatField(default=0)
     total_open_interest_ce = mongoFields.FloatField()
-    total_vol_ce = mongoFields.FloatField()
+    total_volume_ce = mongoFields.FloatField()
     total_open_interest_pe = mongoFields.FloatField()
     total_volume_pe = mongoFields.FloatField()
     pcr_open_interest = mongoFields.FloatField()

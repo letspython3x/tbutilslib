@@ -73,7 +73,7 @@ def change_date_format(val: str | date, fmt=DateFormatEnum.TB_DATE.value):
     dateformat.
     """
 
-    _date = str_to_date(val) if isinstance(val, str) else val
+    _date = str_to_date(val, fmt) if isinstance(val, str) else val
     return _date.strftime(fmt)
 
 

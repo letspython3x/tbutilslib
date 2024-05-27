@@ -1,7 +1,7 @@
 """Events Schema."""
 from marshmallow import Schema, fields, pre_load
 
-from ...utils.dtu import change_date_format
+from ...utils.dtu import change_date_format, str_to_date
 from ...utils.enums import DateFormatEnum
 
 
@@ -21,11 +21,12 @@ class EventsSchema(Schema):
     def marshal_nse(self, in_data: dict, **kwargs) -> dict:
         is_nse = in_data.get("is_nse", False)
         if is_nse:
+            event_date = str_to_date(in_data["date"], DateFormatEnum.NSE_DATE.value)
+            event_date = change_date_format(event_date, DateFormatEnum.TB_DATE.value)
+
             return {
                 "security": in_data["symbol"],
-                "event_date": change_date_format(
-                    in_data["date"], DateFormatEnum.TB_DATE.value
-                ),
+                "event_date": event_date,
                 "company": in_data["company"],
                 "purpose": in_data["purpose"],
                 "description": in_data["bm_desc"],

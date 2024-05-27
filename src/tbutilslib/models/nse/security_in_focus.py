@@ -14,6 +14,7 @@ class SecurityInFocusCollection(BaseCollection):
 
     security = mFields.StringField(required=True)
     strike_prices = mFields.ListField(mFields.IntField())
+    expiry_dates = mFields.ListField(mFields.DateField(format=DateFormatEnum.TB_DATE.value))
     is_fno = mFields.BooleanField(default=False)
     on_date = mFields.DateField(
         format=DateFormatEnum.TB_DATE.value, default=date.today()

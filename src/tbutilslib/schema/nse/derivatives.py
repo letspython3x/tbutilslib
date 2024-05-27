@@ -2,7 +2,7 @@
 from marshmallow import Schema, fields, pre_load
 
 from ...utils.common import validate_quantity
-from ...utils.dtu import parse_timestamp, change_date_format
+from ...utils.dtu import parse_timestamp, change_date_format, str_to_date
 from ...utils.enums import DateFormatEnum
 
 
@@ -32,17 +32,35 @@ class CumulativeDerivativesSchema(Schema):
         Args:
             in_data: dict
         """
-        if "timestamp" in in_data:
-            timestamp = in_data["timestamp"]
-            on_date = parse_timestamp(timestamp).date()
-            in_data["on_date"] = change_date_format(on_date, DateFormatEnum.TB_DATE.value)
 
-        if "expiry_date" in in_data:
-            in_data["expiry_date"] = (
-                change_date_format(
-                    in_data["expiry_date"], DateFormatEnum.TB_DATE.value
-                ),
-            )
+        is_nse = in_data.get("is_nse")
+        if is_nse:
+            if "timestamp" in in_data:
+                timestamp = in_data["timestamp"]
+                on_date = parse_timestamp(timestamp).date()
+                in_data["on_date"] = change_date_format(on_date, DateFormatEnum.TB_DATE.value)
+
+            if "expiry_date" in in_data:
+                expiry_date = str_to_date(in_data.get("expiry_date"), DateFormatEnum.NSE_DATE.value)
+                in_data["expiry_date"] = change_date_format(expiry_date, DateFormatEnum.TB_DATE.value)
+
+            return {
+                "security": in_data["security"],
+                "spot_price": in_data["spot_price"],
+                "future_price": in_data["future_price"],
+                "total_open_interest_ce": in_data["total_open_interest_ce"],
+                "total_volume_ce": in_data["total_volume_ce"],
+                "total_open_interest_pe": in_data["total_open_interest_pe"],
+                "total_volume_pe": in_data["total_volume_pe"],
+                "pcr_open_interest": in_data["pcr_open_interest"],
+                "pcr_volume": in_data["pcr_volume"],
+                "total_open_interest_fut": in_data["total_open_interest_fut"],
+                "total_volume_fut": in_data["total_volume_fut"],
+                "expiry_date": in_data["expiry_date"],
+                "on_date": in_data["on_date"],
+                "timestamp": change_date_format(in_data["timestamp"], DateFormatEnum.FULL_TS.value),
+            }
+
         return in_data
 
 
@@ -108,6 +126,7 @@ class DerivativesSchemaCommonFields(Schema):
         if is_nse:
             timestamp = in_data["timestamp"]
             on_date = parse_timestamp(timestamp).date()
+            expiry_date = str_to_date(in_data.get("expiryDate"), DateFormatEnum.NSE_DATE.value)
 
             return {
                 "security": in_data["security"],
@@ -142,9 +161,7 @@ class DerivativesSchemaCommonFields(Schema):
                 "market_wide_position_limits": in_data["marketWidePositionLimits"],
                 "spot_price": in_data.get("spotPrice")
                 or in_data.get("underlyingValue"),
-                "expiry_date": change_date_format(
-                    in_data["expiryDate"], DateFormatEnum.TB_DATE.value
-                ),
+                "expiry_date": change_date_format(expiry_date, DateFormatEnum.TB_DATE.value),
                 "on_date": change_date_format(on_date, DateFormatEnum.TB_DATE.value),
                 "timestamp": change_date_format(timestamp, DateFormatEnum.FULL_TS.value),
             }

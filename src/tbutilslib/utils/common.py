@@ -1,10 +1,13 @@
 """Common Utils."""
+import logging
 from datetime import datetime, timedelta
 
 from marshmallow import ValidationError
 
 from .dtu import parse_str_to_date_in_dict
 from .enums import MarketTimingEnum
+
+logger = logging.getLogger("tbutilslib." + __name__)
 
 
 def indexed_data(index: str, data: list[dict]) -> dict:
@@ -60,9 +63,10 @@ def get_next_thursday(dt):
     return (dt + timedelta(days=expected_days)).strftime("%d-%b-%Y")
 
 
-def validate_quantity(n, valid_value=0):
-    if n <= valid_value:
-        raise ValidationError(f"Value: {n} must be greater than {valid_value}.")
+def validate_quantity(number, valid_value=0):
+    if not number or number <= valid_value:
+        logger.warning(f"Value: {number} must be greater than {valid_value}.")
+        return 0
 
 
 def is_trading_hours_open() -> bool:
