@@ -78,9 +78,9 @@ class EquityMetaCollection(BaseCollection):
     isin = mongoFields.StringField()
     series = mongoFields.StringField()
     is_fno = mongoFields.BooleanField(default=False)
-    is_nifty50 = mongoFields.BooleanField(default=False)
-    is_nifty100 = mongoFields.BooleanField(default=False)
-    is_nifty500 = mongoFields.BooleanField(default=False)
+    is_nifty_50 = mongoFields.BooleanField(default=False)
+    is_nifty_100 = mongoFields.BooleanField(default=False)
+    is_nifty_500 = mongoFields.BooleanField(default=False)
     meta = deepcopy(BASE_META)
     meta["ordering"] = ["-security"]
     meta["collection"] = MongoConfig.EQUITY_META

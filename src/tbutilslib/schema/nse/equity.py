@@ -20,7 +20,7 @@ class EquitySchema(Schema):
     previous_close = fields.Float()
     change = fields.Float()
     p_change = fields.Float()
-    total_traded_volume = fields.Integer(validate=validate_quantity)
+    total_traded_volume = fields.Integer(validate=validate_quantity, default=0)
     total_traded_value = fields.Float()
     year_high = fields.Float()
     year_low = fields.Float()
@@ -181,6 +181,14 @@ class EquityMetaSchema(Schema):
     isin = fields.String()
     series = fields.String()
     is_fno = fields.Boolean(default=False)
-    is_nifty50 = fields.Boolean(default=False)
-    is_nifty100 = fields.Boolean(default=False)
-    is_nifty500 = fields.Boolean(default=False)
+    is_nifty_50 = fields.Boolean(default=False)
+    is_nifty_100 = fields.Boolean(default=False)
+    is_nifty_500 = fields.Boolean(default=False)
+
+
+class EquityMetaResponseSchema(Schema):
+    """Equity Meta Response Schema."""
+
+    equity_meta = fields.Boolean(default=True)
+    total_items = fields.Integer()
+    items = fields.List(fields.Nested(EquityMetaSchema))

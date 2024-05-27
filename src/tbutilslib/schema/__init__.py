@@ -16,6 +16,8 @@ from ..schema.nse.equity import (
     EquitySchema,
     AdvanceDeclineResponseSchema,
     AdvanceDeclineSchema,
+    EquityMetaSchema,
+    EquityMetaResponseSchema,
 )
 from ..schema.nse.events import EventsResponseSchema, EventsSchema
 from ..schema.nse.max_oi import MaxOpenInterestResponseSchema, MaxOpenInterestSchema

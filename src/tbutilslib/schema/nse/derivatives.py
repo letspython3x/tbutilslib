@@ -134,6 +134,7 @@ class DerivativesSchemaCommonFields(Schema):
                 "p_change": in_data["pChange"],
                 "strike_price": in_data["strikePrice"],
                 "traded_volume": in_data.get("tradedVolume")
+                or 0
                 or in_data.get("totalTradedVolume"),
                 "spot_price": in_data.get("spotPrice")
                 or in_data.get("underlyingValue"),
@@ -291,7 +292,7 @@ class HistoricalDerivativesSchema(Schema):
                 "last_price": in_data["lastPrice"],
                 "settle_price": in_data["settlePrice"],
                 "prev_close_price": in_data["prevClosePrice"],
-                "traded_volume": in_data["tradedVolume"],
+                "traded_volume": in_data["tradedVolume"] or 0,
                 "traded_value": in_data["tradedValue"],
                 "premium_value": in_data["premiumValue"],
                 "open_interest": in_data["openInterest"],

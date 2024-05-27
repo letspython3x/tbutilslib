@@ -20,6 +20,7 @@ class DerivativeTypeEnum(Enum):
 class MarketNamesEnum(Enum):
     CAPITAL_MARKET = "CAPITAL MARKET"
     CURRENCY = "CURRENCY"
+    CURRENCY_FUTURE = "CURRENCYFUTURE"
     COMMODITY = "COMMODITY"
     DEBT = "DEBT"
 
