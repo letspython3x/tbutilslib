@@ -33,8 +33,9 @@ class CumulativeDerivativesSchema(Schema):
             in_data: dict
         """
         if "timestamp" in in_data:
-            ts = parse_timestamp(in_data["timestamp"])
-            in_data["on_date"] = ts.date().strftime(DateFormatEnum.TB_DATE.value)
+            timestamp = in_data["timestamp"]
+            on_date = parse_timestamp(timestamp).date()
+            in_data["on_date"] = change_date_format(on_date, DateFormatEnum.TB_DATE.value)
 
         if "expiry_date" in in_data:
             in_data["expiry_date"] = (
@@ -105,6 +106,9 @@ class DerivativesSchemaCommonFields(Schema):
 
         is_nse = in_data.get("is_nse")
         if is_nse:
+            timestamp = in_data["timestamp"]
+            on_date = parse_timestamp(timestamp).date()
+
             return {
                 "security": in_data["security"],
                 "identifier": in_data["identifier"],
@@ -141,13 +145,8 @@ class DerivativesSchemaCommonFields(Schema):
                 "expiry_date": change_date_format(
                     in_data["expiryDate"], DateFormatEnum.TB_DATE.value
                 ),
-                # TODO: Check onDate to fetch from timestamp
-                "on_date": change_date_format(
-                    in_data["onDate"], DateFormatEnum.TB_DATE.value
-                ),
-                "timestamp": change_date_format(
-                    in_data["timestamp"], DateFormatEnum.FULL_TS.value
-                ),
+                "on_date": change_date_format(on_date, DateFormatEnum.TB_DATE.value),
+                "timestamp": change_date_format(timestamp, DateFormatEnum.FULL_TS.value),
             }
 
         return in_data
