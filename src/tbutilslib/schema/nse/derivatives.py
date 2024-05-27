@@ -38,11 +38,17 @@ class CumulativeDerivativesSchema(Schema):
             if "timestamp" in in_data:
                 timestamp = in_data["timestamp"]
                 on_date = parse_timestamp(timestamp).date()
-                in_data["on_date"] = change_date_format(on_date, DateFormatEnum.TB_DATE.value)
+                in_data["on_date"] = change_date_format(
+                    on_date, DateFormatEnum.TB_DATE.value
+                )
 
             if "expiry_date" in in_data:
-                expiry_date = str_to_date(in_data.get("expiry_date"), DateFormatEnum.NSE_DATE.value)
-                in_data["expiry_date"] = change_date_format(expiry_date, DateFormatEnum.TB_DATE.value)
+                expiry_date = str_to_date(
+                    in_data.get("expiry_date"), DateFormatEnum.NSE_DATE.value
+                )
+                in_data["expiry_date"] = change_date_format(
+                    expiry_date, DateFormatEnum.TB_DATE.value
+                )
 
             return {
                 "security": in_data["security"],
@@ -58,7 +64,9 @@ class CumulativeDerivativesSchema(Schema):
                 "total_volume_fut": in_data["total_volume_fut"],
                 "expiry_date": in_data["expiry_date"],
                 "on_date": in_data["on_date"],
-                "timestamp": change_date_format(in_data["timestamp"], DateFormatEnum.FULL_TS.value),
+                "timestamp": change_date_format(
+                    in_data["timestamp"], DateFormatEnum.FULL_TS.value
+                ),
             }
 
         return in_data
@@ -95,38 +103,23 @@ class DerivativesSchemaCommonFields(Schema):
     change = fields.Float()
     p_change = fields.Float()
     strike_price = fields.Float()
-    instrument_type = fields.String()
-    open_price = fields.Float()
-    high_price = fields.Float()
-    low_price = fields.Float()
-    close_price = fields.Float()
-    prev_close = fields.Float()
-    number_of_contracts_traded = fields.Integer()
-    total_turnover = fields.Float()
     traded_volume = fields.Integer(validate=validate_quantity)
-    value = fields.Float(validate=validate_quantity)
-    vmap = fields.Float()
-    premium_turnover = fields.Float()
-    market_lot = fields.Integer(validate=validate_quantity)
-    settlement_price = fields.Float()
-    daily_volatility = fields.Float()
-    annualised_volatility = fields.Float()
-    client_wise_position_limits = fields.Integer()
-    market_wide_position_limits = fields.Integer()
     spot_price = fields.Float()
     expiry_date = fields.Date(DateFormatEnum.TB_DATE.value)
     on_date = fields.Date(DateFormatEnum.TB_DATE.value)
     timestamp = fields.DateTime(DateFormatEnum.FULL_TS.value)
 
     @pre_load
-    def slugify_date(self, in_data: dict, **kwargs) -> dict:
+    def marshal_fields(self, in_data: dict, **kwargs) -> dict:
         """Set a new key on_date."""
 
         is_nse = in_data.get("is_nse")
         if is_nse:
             timestamp = in_data["timestamp"]
             on_date = parse_timestamp(timestamp).date()
-            expiry_date = str_to_date(in_data.get("expiryDate"), DateFormatEnum.NSE_DATE.value)
+            expiry_date = str_to_date(
+                in_data.get("expiryDate"), DateFormatEnum.NSE_DATE.value
+            )
 
             return {
                 "security": in_data["security"],
@@ -140,30 +133,17 @@ class DerivativesSchemaCommonFields(Schema):
                 "change": in_data["change"],
                 "p_change": in_data["pChange"],
                 "strike_price": in_data["strikePrice"],
-                "instrument_type": in_data["instrumentType"],
-                "open_price": in_data["openPrice"],
-                "high_price": in_data["highPrice"],
-                "low_price": in_data["lowPrice"],
-                "close_price": in_data["closePrice"],
-                "prev_close": in_data["prevClose"],
-                "number_of_contracts_traded": in_data["numberOfContractsTraded"],
-                "total_turnover": in_data["totalTurnover"],
-                "traded_volume": in_data["tradedVolume"],
-                "value": in_data["value"],
-                "vmap": in_data["vmap"],
-                "premium_turnover": in_data["premiumTurnover"],
-                "market_lot": in_data["marketLot"],
-                "settlement_price": in_data["settlementPrice"],
-                "daily_volatility": in_data.get("dailyVolatility")
-                or in_data.get("dailyvolatility"),
-                "annualised_volatility": in_data["annualisedVolatility"],
-                "client_wise_position_limits": in_data["clientWisePositionLimits"],
-                "market_wide_position_limits": in_data["marketWidePositionLimits"],
+                "traded_volume": in_data.get("tradedVolume")
+                or in_data.get("totalTradedVolume"),
                 "spot_price": in_data.get("spotPrice")
                 or in_data.get("underlyingValue"),
-                "expiry_date": change_date_format(expiry_date, DateFormatEnum.TB_DATE.value),
+                "expiry_date": change_date_format(
+                    expiry_date, DateFormatEnum.TB_DATE.value
+                ),
                 "on_date": change_date_format(on_date, DateFormatEnum.TB_DATE.value),
-                "timestamp": change_date_format(timestamp, DateFormatEnum.FULL_TS.value),
+                "timestamp": change_date_format(
+                    timestamp, DateFormatEnum.FULL_TS.value
+                ),
             }
 
         return in_data
@@ -181,7 +161,54 @@ class DerivativesSchemaResponseCommonFields(Schema):
 class IndexDerivativesSchema(DerivativesSchemaCommonFields):
     """Index Derivatives Schema."""
 
-    pass
+    instrument_type = fields.String()
+    open_price = fields.Float()
+    high_price = fields.Float()
+    low_price = fields.Float()
+    close_price = fields.Float()
+    prev_close = fields.Float()
+    number_of_contracts_traded = fields.Integer()
+    total_turnover = fields.Float()
+    value = fields.Float()
+    vmap = fields.Float()
+    premium_turnover = fields.Float()
+    market_lot = fields.Integer(validate=validate_quantity)
+    settlement_price = fields.Float()
+    daily_volatility = fields.Float()
+    annualised_volatility = fields.Float()
+    client_wise_position_limits = fields.Integer()
+    market_wide_position_limits = fields.Integer()
+
+    @pre_load
+    def marshal_fields(self, in_data: dict, **kwargs) -> dict:
+        """Set a new key for fields."""
+
+        is_nse = in_data.get("is_nse")
+        if is_nse:
+            super_data = super().marshal_fields(in_data, **kwargs)
+            return {
+                **super_data,
+                "instrument_type": in_data["instrumentType"],
+                "open_price": in_data["openPrice"],
+                "high_price": in_data["highPrice"],
+                "low_price": in_data["lowPrice"],
+                "close_price": in_data["closePrice"],
+                "prev_close": in_data["prevClose"],
+                "number_of_contracts_traded": in_data["numberOfContractsTraded"],
+                "total_turnover": in_data["totalTurnover"],
+                "value": in_data["value"],
+                "vmap": in_data["vmap"],
+                "premium_turnover": in_data["premiumTurnover"],
+                "market_lot": in_data["marketLot"],
+                "settlement_price": in_data["settlementPrice"],
+                "daily_volatility": in_data.get("dailyVolatility")
+                or in_data.get("dailyvolatility"),
+                "annualised_volatility": in_data["annualisedVolatility"],
+                "client_wise_position_limits": in_data["clientWisePositionLimits"],
+                "market_wide_position_limits": in_data["marketWidePositionLimits"],
+            }
+
+        return in_data
 
 
 class EquityDerivativesSchema(DerivativesSchemaCommonFields):
