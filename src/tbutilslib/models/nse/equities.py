@@ -67,3 +67,20 @@ class AdvanceDeclineCollection(BaseCollection):
     meta = deepcopy(BASE_META)
     meta["ordering"] = ["-timestamp"]
     meta["collection"] = MongoConfig.ADVANCE_DECLINE
+
+
+class EquityMetaCollection(BaseCollection):
+    """STATIC_EQUITY collection."""
+
+    security = mongoFields.StringField(required=True)
+    company = mongoFields.StringField()
+    industry = mongoFields.StringField()
+    isin = mongoFields.StringField()
+    series = mongoFields.StringField()
+    is_fno = mongoFields.BooleanField(default=False)
+    is_nifty50 = mongoFields.BooleanField(default=False)
+    is_nifty100 = mongoFields.BooleanField(default=False)
+    is_nifty500 = mongoFields.BooleanField(default=False)
+    meta = deepcopy(BASE_META)
+    meta["ordering"] = ["-security"]
+    meta["collection"] = MongoConfig.EQUITY_META

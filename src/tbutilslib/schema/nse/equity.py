@@ -65,10 +65,14 @@ class EquitySchema(Schema):
             ts = parse_timestamp(in_data["timestamp"])
             on_date = ts.date().strftime(DateFormatEnum.TB_DATE.value)
 
-            date_30d_ago = str_to_date(in_data["date30dAgo"], DateFormatEnum.NSE_DATE.value)
+            date_30d_ago = str_to_date(
+                in_data["date30dAgo"], DateFormatEnum.NSE_DATE.value
+            )
             date_30d_ago = date_30d_ago.strftime(DateFormatEnum.TB_DATE.value)
 
-            date_365d_ago = str_to_date(in_data["date365dAgo"], DateFormatEnum.NSE_DATE.value)
+            date_365d_ago = str_to_date(
+                in_data["date365dAgo"], DateFormatEnum.NSE_DATE.value
+            )
             date_365d_ago = date_365d_ago.strftime(DateFormatEnum.TB_DATE.value)
 
             return {
@@ -97,8 +101,12 @@ class EquitySchema(Schema):
                 "on_date": on_date,
                 "date_30d_ago": date_30d_ago,
                 "date_365d_ago": date_365d_ago,
-                "timestamp": change_date_format(in_data["timestamp"], DateFormatEnum.FULL_TS.value),
-                "last_update_time": change_date_format(in_data["lastUpdateTime"], DateFormatEnum.FULL_TS.value),
+                "timestamp": change_date_format(
+                    in_data["timestamp"], DateFormatEnum.FULL_TS.value
+                ),
+                "last_update_time": change_date_format(
+                    in_data["lastUpdateTime"], DateFormatEnum.FULL_TS.value
+                ),
                 "company_name": in_data["companyName"],
                 "industry": in_data.get("industry") or "",
                 "active_series": in_data["activeSeries"],
@@ -161,3 +169,18 @@ class AdvanceDeclineResponseSchema(Schema):
     advance_decline = fields.Boolean(default=True)
     total_items = fields.Integer()
     items = fields.List(fields.Nested(AdvanceDeclineSchema))
+
+
+class EquityMetaSchema(Schema):
+    """Static Equity Schema."""
+
+    id = fields.String(required=False)
+    security = fields.String()
+    company = fields.String()
+    industry = fields.String()
+    isin = fields.String()
+    series = fields.String()
+    is_fno = fields.Boolean(default=False)
+    is_nifty50 = fields.Boolean(default=False)
+    is_nifty100 = fields.Boolean(default=False)
+    is_nifty500 = fields.Boolean(default=False)
