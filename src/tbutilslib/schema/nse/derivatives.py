@@ -1,8 +1,15 @@
 """Derivatives Related Schema."""
+from datetime import datetime, date
+
 from marshmallow import Schema, fields, pre_load
 
 from ...utils.common import validate_quantity
-from ...utils.dtu import parse_timestamp, change_date_format, str_to_date
+from ...utils.dtu import (
+    parse_timestamp,
+    change_date_format,
+    str_to_date,
+    parse_timestamp_to_str,
+)
 from ...utils.enums import DateFormatEnum
 
 
@@ -26,27 +33,18 @@ class CumulativeDerivativesSchema(Schema):
     timestamp = fields.DateTime(DateFormatEnum.FULL_TS.value)
 
     @pre_load
-    def slugify_date(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key on_date.
-
-        Args:
-            in_data: dict
-        """
+    def marshal_fields(self, in_data: dict, **kwargs) -> dict:
+        """Marshal the data fields if it comes from nse."""
 
         is_nse = in_data.get("is_nse")
         if is_nse:
-            if "timestamp" in in_data:
-                timestamp = in_data["timestamp"]
-                on_date = parse_timestamp(timestamp).date()
-                in_data["on_date"] = change_date_format(
-                    on_date, DateFormatEnum.TB_DATE.value
-                )
-
+            # if "timestamp" in in_data:
+            timestamp: datetime = parse_timestamp(in_data["timestamp"])
             if "expiry_date" in in_data:
-                expiry_date = str_to_date(
-                    in_data.get("expiry_date"), DateFormatEnum.NSE_DATE.value
+                expiry_date: date = str_to_date(
+                    in_data["expiry_date"], DateFormatEnum.NSE_DATE.value
                 )
-                in_data["expiry_date"] = change_date_format(
+                expiry_date: str = change_date_format(
                     expiry_date, DateFormatEnum.TB_DATE.value
                 )
 
@@ -62,10 +60,12 @@ class CumulativeDerivativesSchema(Schema):
                 "pcr_volume": in_data["pcr_volume"],
                 "total_open_interest_fut": in_data["total_open_interest_fut"],
                 "total_volume_fut": in_data["total_volume_fut"],
-                "expiry_date": in_data["expiry_date"],
-                "on_date": in_data["on_date"],
-                "timestamp": change_date_format(
-                    in_data["timestamp"], DateFormatEnum.FULL_TS.value
+                "expiry_date": expiry_date,
+                "on_date": change_date_format(
+                    timestamp.date(), DateFormatEnum.TB_DATE.value
+                ),
+                "timestamp": parse_timestamp_to_str(
+                    timestamp, DateFormatEnum.FULL_TS.value
                 ),
             }
 
@@ -111,14 +111,25 @@ class DerivativesSchemaCommonFields(Schema):
 
     @pre_load
     def marshal_fields(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key on_date."""
+        """Marshal the fields."""
 
         is_nse = in_data.get("is_nse")
         if is_nse:
-            timestamp = in_data["timestamp"]
-            on_date = parse_timestamp(timestamp).date()
-            expiry_date = str_to_date(
-                in_data.get("expiryDate"), DateFormatEnum.NSE_DATE.value
+            timestamp: datetime = parse_timestamp(in_data["timestamp"])
+            on_date: str = change_date_format(
+                timestamp.date(), DateFormatEnum.TB_DATE.value
+            )
+            expiry_date: date = str_to_date(
+                in_data["expiryDate"], DateFormatEnum.NSE_DATE.value
+            )
+            expiry_date: str = change_date_format(
+                expiry_date, DateFormatEnum.TB_DATE.value
+            )
+            traded_volume: int = (
+                in_data.get("tradedVolume") or in_data.get("totalTradedVolume") or 0
+            )
+            spot_price: float = in_data.get("spotPrice") or in_data.get(
+                "underlyingValue"
             )
 
             return {
@@ -133,16 +144,11 @@ class DerivativesSchemaCommonFields(Schema):
                 "change": in_data["change"],
                 "p_change": in_data["pChange"],
                 "strike_price": in_data["strikePrice"],
-                "traded_volume": in_data.get("tradedVolume")
-                or 0
-                or in_data.get("totalTradedVolume"),
-                "spot_price": in_data.get("spotPrice")
-                or in_data.get("underlyingValue"),
-                "expiry_date": change_date_format(
-                    expiry_date, DateFormatEnum.TB_DATE.value
-                ),
-                "on_date": change_date_format(on_date, DateFormatEnum.TB_DATE.value),
-                "timestamp": change_date_format(
+                "traded_volume": traded_volume,
+                "spot_price": spot_price,
+                "expiry_date": expiry_date,
+                "on_date": on_date,
+                "timestamp": parse_timestamp_to_str(
                     timestamp, DateFormatEnum.FULL_TS.value
                 ),
             }
@@ -270,14 +276,22 @@ class HistoricalDerivativesSchema(Schema):
     timestamp = fields.DateTime(format=DateFormatEnum.FULL_TS_TZ.value)
 
     @pre_load
-    def slugify_data(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key on_date.
+    def marshal_fields(self, in_data: dict, **kwargs) -> dict:
+        """Marshal the fields."""
 
-        Args:
-            in_data: dict
-        """
         is_nse = in_data.get("is_nse")
         if is_nse:
+            timestamp: datetime = parse_timestamp(in_data["timestamp"])
+            on_date: str = change_date_format(
+                timestamp.date(), DateFormatEnum.TB_DATE.value
+            )
+            expiry_date: date = str_to_date(
+                in_data["expiryDate"], DateFormatEnum.NSE_DATE.value
+            )
+            expiry_date: str = change_date_format(
+                expiry_date, DateFormatEnum.TB_DATE.value
+            )
+
             in_data = {
                 "security": in_data["security"],
                 "instrument": in_data["instrument"],
@@ -298,12 +312,10 @@ class HistoricalDerivativesSchema(Schema):
                 "open_interest": in_data["openInterest"],
                 "change_in_open_interest": in_data["changeInOI"],
                 "position_type": in_data["positionType"],
-                "on_date": in_data["onDate"],
-                "expiry_date": change_date_format(
-                    in_data["expiryDate"], DateFormatEnum.TB_DATE.value
-                ),
-                "timestamp": change_date_format(
-                    in_data["timestamp"], DateFormatEnum.FULL_TS.value
+                "on_date": on_date,
+                "expiry_date": expiry_date,
+                "timestamp": parse_timestamp_to_str(
+                    timestamp, DateFormatEnum.FULL_TS.value
                 ),
             }
 

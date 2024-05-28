@@ -1,8 +1,15 @@
 """Equity Related Schema."""
+from datetime import datetime, date
+
 from marshmallow import Schema, fields, pre_load
 
 from ...utils.common import validate_quantity
-from ...utils.dtu import parse_timestamp, str_to_date, change_date_format
+from ...utils.dtu import (
+    parse_timestamp,
+    str_to_date,
+    change_date_format,
+    parse_timestamp_to_str,
+)
 from ...utils.enums import DateFormatEnum
 
 
@@ -62,18 +69,24 @@ class EquitySchema(Schema):
         """
         is_nse = in_data.get("is_nse", False)
         if is_nse:
-            ts = parse_timestamp(in_data["timestamp"])
-            on_date = ts.date().strftime(DateFormatEnum.TB_DATE.value)
+            timestamp: datetime = parse_timestamp(in_data["timestamp"])
+            on_date: str = change_date_format(
+                timestamp.date(), DateFormatEnum.TB_DATE.value
+            )
 
-            date_30d_ago = str_to_date(
+            date_30d_ago: date = str_to_date(
                 in_data["date30dAgo"], DateFormatEnum.NSE_DATE.value
             )
-            date_30d_ago = date_30d_ago.strftime(DateFormatEnum.TB_DATE.value)
+            date_30d_ago: str = change_date_format(
+                date_30d_ago, DateFormatEnum.TB_DATE.value
+            )
 
-            date_365d_ago = str_to_date(
+            date_365d_ago: date = str_to_date(
                 in_data["date365dAgo"], DateFormatEnum.NSE_DATE.value
             )
-            date_365d_ago = date_365d_ago.strftime(DateFormatEnum.TB_DATE.value)
+            date_365d_ago: str = change_date_format(
+                date_365d_ago, DateFormatEnum.TB_DATE.value
+            )
 
             return {
                 "security": in_data["symbol"],
@@ -101,8 +114,8 @@ class EquitySchema(Schema):
                 "on_date": on_date,
                 "date_30d_ago": date_30d_ago,
                 "date_365d_ago": date_365d_ago,
-                "timestamp": change_date_format(
-                    in_data["timestamp"], DateFormatEnum.FULL_TS.value
+                "timestamp": parse_timestamp_to_str(
+                    timestamp, DateFormatEnum.FULL_TS.value
                 ),
                 "last_update_time": change_date_format(
                     in_data["lastUpdateTime"], DateFormatEnum.FULL_TS.value
@@ -158,8 +171,10 @@ class AdvanceDeclineSchema(Schema):
         Args:
             in_data: dict
         """
-        ts = parse_timestamp(in_data["timestamp"])
-        in_data["on_date"] = ts.date().strftime(DateFormatEnum.TB_DATE.value)
+        timestamp: datetime = parse_timestamp(in_data["timestamp"])
+        in_data["on_date"] = change_date_format(
+            timestamp.date(), DateFormatEnum.TB_DATE.value
+        )
         return in_data
 
 

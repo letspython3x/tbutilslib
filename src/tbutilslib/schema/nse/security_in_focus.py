@@ -19,17 +19,15 @@ class SecurityInFocusSchema(Schema):
     timestamp = fields.DateTime(DateFormatEnum.FULL_TS.value, default=datetime.now)
 
     @pre_load
-    def slugify_date(self, in_data: dict, **kwargs) -> dict:
-        """Set a new key on_date.
+    def marshal_fields(self, in_data: dict, **kwargs) -> dict:
+        """Marshal the fields."""
 
-        Args:
-            in_data: dict
-        """
         is_nse = in_data.get("is_nse", False)
         if is_nse:
-            if "timestamp" in in_data:
-                ts = parse_timestamp(in_data["timestamp"])
-                in_data["on_date"] = ts.date().strftime(DateFormatEnum.TB_DATE.value)
+            timestamp: datetime = parse_timestamp(in_data["timestamp"])
+            on_date: str = change_date_format(
+                timestamp.date(), DateFormatEnum.TB_DATE.value
+            )
 
             if "expiry_dates" in in_data:
                 updated_expiry_dates = []
@@ -43,7 +41,7 @@ class SecurityInFocusSchema(Schema):
                 "strike_prices": in_data["strike_prices"],
                 "expiry_dates": updated_expiry_dates,
                 "is_fno": in_data.get("is_fno", False),
-                "on_date": in_data["on_date"],
+                "on_date": on_date,
                 "timestamp": in_data["timestamp"],
             }
 
