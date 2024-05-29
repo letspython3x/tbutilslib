@@ -36,7 +36,7 @@ COLL_INDEXES = [
         "collection": IndexDerivativesCollection,
         "index": ["identifier", "expiry_date", "-timestamp"],
     },
-    {"collection": NiftyEquityCollection, "index": ["identifier", "-last_update_time"]},
+    {"collection": NiftyEquityCollection, "index": ["identifier", "-timestamp"]},
     {"collection": SecurityInFocusCollection, "index": ["+security", "-on_date"]},
     {"collection": OrdersCollection, "index": ["+security", "-timestamp"]},
     {
