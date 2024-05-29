@@ -10,6 +10,7 @@ from tbutilslib.models import (
     HistoricalDerivatesCollection,
     IndexDerivativesCollection,
     NiftyEquityCollection,
+    IndexCollection,
     SecurityInFocusCollection,
     OrdersCollection,
     PositionsCollection,
@@ -37,6 +38,7 @@ COLL_INDEXES = [
         "index": ["identifier", "expiry_date", "-timestamp"],
     },
     {"collection": NiftyEquityCollection, "index": ["identifier", "-timestamp"]},
+    {"collection": IndexCollection, "index": ["security", "-timestamp"]},
     {"collection": SecurityInFocusCollection, "index": ["+security", "-on_date"]},
     {"collection": OrdersCollection, "index": ["+security", "-timestamp"]},
     {

@@ -70,6 +70,7 @@ class EquitySchema(Schema):
         is_nse = in_data.get("is_nse", False)
         if is_nse:
             timestamp: datetime = parse_timestamp(in_data["timestamp"])
+            last_update_time: datetime = parse_timestamp(in_data["lastUpdateTime"])
             on_date: str = change_date_format(
                 timestamp.date(), DateFormatEnum.TB_DATE.value
             )
@@ -117,8 +118,8 @@ class EquitySchema(Schema):
                 "timestamp": parse_timestamp_to_str(
                     timestamp, DateFormatEnum.FULL_TS.value
                 ),
-                "last_update_time": change_date_format(
-                    in_data["lastUpdateTime"], DateFormatEnum.FULL_TS.value
+                "last_update_time": parse_timestamp_to_str(
+                    last_update_time, DateFormatEnum.FULL_TS.value
                 ),
                 "company_name": in_data["companyName"],
                 "industry": in_data.get("industry") or "",
