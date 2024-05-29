@@ -20,11 +20,17 @@ COLL_INDEXES = [
     {"collection": AdvanceDeclineCollection, "index": ["timestamp"]},
     {
         "collection": CumulativeDerivativesCollection,
-        "index": ["security", "expiry_date", "-timestamp"],
+        "index": ["security", "expiry_date", "-on_date", "-timestamp"],
     },
     {
         "collection": EquityDerivatesCollection,
-        "index": ["identifier", "expiry_date", "-timestamp"],
+        "index": [
+            "security",
+            "strike_price",
+            "option_type",
+            "expiry_date",
+            "-timestamp",
+        ],
     },
     {"collection": ExpiryDatesCollection, "index": ["security_type", "-timestamp"]},
     {"collection": EventsCollection, "index": ["security", "purpose", "-event_date"]},
@@ -35,7 +41,13 @@ COLL_INDEXES = [
     },
     {
         "collection": IndexDerivativesCollection,
-        "index": ["identifier", "expiry_date", "-timestamp"],
+        "index": [
+            "security",
+            "strike_price",
+            "option_type",
+            "expiry_date",
+            "-timestamp",
+        ],
     },
     {"collection": NiftyEquityCollection, "index": ["identifier", "-timestamp"]},
     {"collection": IndexCollection, "index": ["security", "-timestamp"]},
