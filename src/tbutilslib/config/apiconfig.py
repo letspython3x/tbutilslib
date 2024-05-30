@@ -60,7 +60,6 @@ class TbApiPathConfig:
     headers = {"Content-Type": "application/json; charset=utf-8"}
     BASE_URI = os.getenv("ENVIRONMENT", "http://127.0.0.1:9000/api/v1/")
     EVENTS_PATH = "events"
-    SECURITY_IN_FOCUS = "security_in_focus"
     MAX_OI = "max_open_interest"
     EXPIRY_DATES = "expiry_dates"
     FII_DII = "fii_dii"
@@ -72,6 +71,7 @@ class TbApiPathConfig:
     INDEX = "index"
     EQUITY = "equity"
     EQUITY_META = "equity_meta"
+    OPTION_META_DATA = "option_meta_data"
     TRADING_DATES = "trading_dates"
     ORDERS = "orders"
     POSITIONS = "positions"

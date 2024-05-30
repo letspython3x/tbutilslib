@@ -5,15 +5,14 @@ from tbutilslib.models import (
     CumulativeDerivativesCollection,
     EventsCollection,
     EquityDerivatesCollection,
-    ExpiryDatesCollection,
     FiiDiiCollection,
     HistoricalDerivatesCollection,
     IndexDerivativesCollection,
     NiftyEquityCollection,
     IndexCollection,
-    SecurityInFocusCollection,
     OrdersCollection,
     PositionsCollection,
+    OptionMetaDataCollection,
 )
 
 COLL_INDEXES = [
@@ -32,7 +31,6 @@ COLL_INDEXES = [
             "-timestamp",
         ],
     },
-    {"collection": ExpiryDatesCollection, "index": ["security_type", "-timestamp"]},
     {"collection": EventsCollection, "index": ["security", "purpose", "-event_date"]},
     {"collection": FiiDiiCollection, "index": ["category", "-on_date"]},
     {
@@ -51,7 +49,7 @@ COLL_INDEXES = [
     },
     {"collection": NiftyEquityCollection, "index": ["identifier", "-timestamp"]},
     {"collection": IndexCollection, "index": ["security", "-timestamp"]},
-    {"collection": SecurityInFocusCollection, "index": ["+security", "-on_date"]},
+    {"collection": OptionMetaDataCollection, "index": ["+security", "-on_date"]},
     {"collection": OrdersCollection, "index": ["+security", "-timestamp"]},
     {
         "collection": PositionsCollection,

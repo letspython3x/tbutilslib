@@ -167,7 +167,7 @@ class TbApi:
 
     def get_security_in_focus(self, on_date: str = TODAY):
         """Fetch cache security in focus from TbApi."""
-        endpoint = f"{TbApiPathConfig.SECURITY_IN_FOCUS}/{on_date}"
+        endpoint = f"{TbApiPathConfig.OPTION_META_DATA}/{on_date}"
         return self.get(endpoint)
 
     def get_historical_derivatives(self, security: str = None, query: Dict = None):

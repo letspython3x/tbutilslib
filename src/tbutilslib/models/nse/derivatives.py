@@ -1,4 +1,5 @@
 """Derivatives Related Collection."""
+from datetime import date, datetime
 
 from copy import deepcopy
 
@@ -113,3 +114,23 @@ class HistoricalDerivatesCollection(BaseCollection):
     meta = deepcopy(BASE_META)
     meta["ordering"] = ["-timestamp"]
     meta["collection"] = MongoConfig.HISTORICAL_DERIVATIVES
+
+
+class OptionMetaDataCollection(BaseCollection):
+    """OptionMetaData collection."""
+
+    security = mongoFields.StringField(required=True)
+    strike_prices = mongoFields.ListField(mongoFields.IntField())
+    expiry_dates = mongoFields.ListField(
+        mongoFields.DateField(format=DateFormatEnum.TB_DATE.value)
+    )
+    is_fno = mongoFields.BooleanField(default=False)
+    on_date = mongoFields.DateField(
+        format=DateFormatEnum.TB_DATE.value, default=date.today()
+    )
+    timestamp = mongoFields.DateTimeField(
+        format=DateFormatEnum.FULL_TS.value, default=datetime.now
+    )
+    meta = deepcopy(BASE_META)
+    meta["ordering"] = ["-timestamp"]
+    meta["collection"] = MongoConfig.OPTION_META_DATA

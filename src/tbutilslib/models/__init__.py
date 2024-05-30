@@ -5,6 +5,7 @@ from ..models.nse.derivatives import (
     EquityDerivatesCollection,
     IndexDerivativesCollection,
     HistoricalDerivatesCollection,
+    OptionMetaDataCollection,
 )
 from ..models.nse.equities import (
     NiftyEquityCollection,
@@ -12,9 +13,7 @@ from ..models.nse.equities import (
     EquityMetaCollection,
 )
 from ..models.nse.events import EventsCollection
-from ..models.nse.security_in_focus import SecurityInFocusCollection
 from ..models.nse.fiidii import FiiDiiCollection
-from ..models.nse.expiry_dates import ExpiryDatesCollection
 from ..models.nse.trading_dates import TradingDatesCollection
 from ..models.nse.orders import OrdersCollection
 from ..models.nse.positions import PositionsCollection
