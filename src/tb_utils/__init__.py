@@ -9,6 +9,7 @@ __version__ = "1.13.0"
 
 from .config.database import DatabaseConfig, db_settings
 from .config.db_session import SessionLocal, get_db
+from .greeks import calculate_greeks, calculate_iv_percentile, calculate_iv_rank
 from .models import (
     Base,
     BlockDeal,
@@ -216,4 +217,8 @@ __all__ = [
     # Telegram Utilities
     "TelegramNotifier",
     "send_telegram_alert",
+    # Option Greeks Utilities
+    "calculate_greeks",
+    "calculate_iv_rank",
+    "calculate_iv_percentile",
 ]
