@@ -5,7 +5,7 @@ PostgreSQL/TimescaleDB data handling, SQLAlchemy model management,
 Pydantic schema validation, and external API integration.
 """
 
-__version__ = "1.13.0"
+__version__ = "1.14.0"
 
 from .config.database import DatabaseConfig, db_settings
 from .config.db_session import SessionLocal, get_db
@@ -24,6 +24,7 @@ from .models import (
     FiiDii,
     FnoExpiry,
     FundamentalData,
+    FundamentalUniverse,
     FuturesOI,
     HistoricalEquityData,
     HistoricalIndexData,
@@ -129,6 +130,7 @@ __all__ = [
     "FiiDii",
     "FnoExpiry",
     "FundamentalData",
+    "FundamentalUniverse",
     "FuturesOI",
     "HistoricalEquityData",
     "HistoricalIndexData",
