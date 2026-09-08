@@ -10,6 +10,7 @@ from .corporate_event import (
     TradingHoliday,
 )
 from .fundamental_data import FundamentalData
+from .fundamental_universe import FundamentalUniverse
 from .historical_data import (
     Candle,
     HistoricalEquityData,
@@ -66,6 +67,7 @@ __all__ = [
     "DeliveryData",
     "MacroIndicator",
     "FundamentalData",
+    "FundamentalUniverse",
     "SystemLog",
     "SystemMetric",
     "TaskLog",
