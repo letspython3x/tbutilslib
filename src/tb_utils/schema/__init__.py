@@ -19,6 +19,7 @@ from .corporate_event import (
     TradingHolidayResponse,
 )
 from .fundamental_data import FundamentalDataResponse
+from .fundamental_universe import FundamentalBasketSummary, FundamentalUniverseResponse
 from .historical_data import (
     CandleResponse,
     HistoricalEquityDataResponse,
@@ -121,6 +122,8 @@ __all__ = [
     "FnOBuildupResponse",
     "MacroIndicatorResponse",
     "FundamentalDataResponse",
+    "FundamentalUniverseResponse",
+    "FundamentalBasketSummary",
     "NseIndexResponse",
     "IndexConstituentResponse",
     "FnoExpiryResponse",
