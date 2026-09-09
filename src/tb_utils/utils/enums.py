@@ -124,4 +124,3 @@ class ExitReasonEnum(StrEnum):
     BROKER_STOP_LOSS = "BROKER_STOP_LOSS"
     LIQUIDATION = "LIQUIDATION"
     MANUAL = "MANUAL"
-
