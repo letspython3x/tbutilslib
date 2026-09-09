@@ -150,6 +150,28 @@ class SyncMarketStore:
             payload["p_change"] = p_change
         self.client.setex(key, expiry_seconds, json.dumps(payload))
 
+    def get_instrument_spot(self, symbol: str) -> dict | None:
+        """Retrieve instrument spot data payload from Redis."""
+        key = get_instrument_spot_key(symbol)
+        data = self.client.get(key)
+        if not data:
+            return None
+        try:
+            return json.loads(data)
+        except Exception as e:
+            logger.error("Error reading spot data for %s: %s", symbol, e)
+            return None
+
+    def get_spot_price(self, symbol: str) -> float | None:
+        """Retrieve latest spot price for symbol from Redis."""
+        data = self.get_instrument_spot(symbol)
+        if data and "price" in data:
+            try:
+                return float(data["price"])
+            except (ValueError, TypeError):
+                return None
+        return None
+
     def store_fno_ban_list(self, banned_symbols: list[str], expiry_seconds: int = 86400) -> None:
         """Store the list of banned F&O symbols."""
         key = get_fno_ban_list_key()
