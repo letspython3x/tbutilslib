@@ -81,6 +81,7 @@ class TradingOrderResponse(TradingOrderCreate):
     filled_quantity: int
     avg_fill_price: Optional[float] = None
     commission: float
+    error_message: Optional[str] = None
     filled_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
