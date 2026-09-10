@@ -122,6 +122,9 @@ class TradingOrder(Base):
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
+    # Broker rejection/error message (populated on REJECTED status)
+    error_message = Column(Text, nullable=True)
+
     # Relationships
     broker = relationship("Broker", back_populates="orders")
     parent_order = relationship("TradingOrder", remote_side=[order_id])
